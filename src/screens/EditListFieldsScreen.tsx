@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, FlatList, StyleSheet } from 'react-native';
+import { View, Text, TextInput, Pressable, FlatList, StyleSheet, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { FieldDef, FieldType } from '../domain/types';
@@ -16,6 +16,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
   const existing = route.params?.list;
   const [name, setName] = useState(existing?.name ?? '');
   const [fields, setFields] = useState<FieldDef[]>(existing?.fields ?? []);
+  const [saving, setSaving] = useState(false);
 
   function addField() {
     setFields((prev) => [
@@ -34,13 +35,20 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
 
   async function save() {
     if (!user || !name.trim()) return;
-    const repo = new FirebaseCatalogRepository(user.uid);
-    if (existing) {
-      await repo.updateListFields(existing.id, fields);
-    } else {
-      await repo.createList(name.trim(), fields);
+    setSaving(true);
+    try {
+      const repo = new FirebaseCatalogRepository(user.uid);
+      if (existing) {
+        await repo.updateListFields(existing.id, fields);
+      } else {
+        await repo.createList(name.trim(), fields);
+      }
+      navigation.goBack();
+    } catch (error) {
+      Alert.alert('Could not save', 'Please try again.');
+    } finally {
+      setSaving(false);
     }
-    navigation.goBack();
   }
 
   return (
@@ -84,8 +92,8 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
       <Pressable style={styles.addFieldButton} onPress={addField}>
         <Text style={styles.addFieldText}>+ Add field</Text>
       </Pressable>
-      <Pressable style={styles.saveButton} onPress={save}>
-        <Text style={styles.saveButtonText}>Save</Text>
+      <Pressable style={styles.saveButton} onPress={save} disabled={saving}>
+        <Text style={styles.saveButtonText}>{saving ? 'Saving...' : 'Save'}</Text>
       </Pressable>
     </View>
   );
