@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { View, TextInput, FlatList, Pressable, Text, StyleSheet } from 'react-native';
+import { View, TextInput, FlatList, Pressable, Text, StyleSheet, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
@@ -32,8 +32,31 @@ export function ListDetailScreen({ route, navigation }: Props) {
 
   useFocusEffect(load);
 
+  function confirmDeleteList() {
+    if (!user) return;
+    Alert.alert('Delete list?', `This removes "${list.name}" and all its items permanently.`, [
+      { text: 'Cancel', style: 'cancel' },
+      {
+        text: 'Delete',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            const repo = new FirebaseCatalogRepository(user.uid);
+            await repo.deleteList(list.id);
+            navigation.navigate('Home');
+          } catch (error) {
+            Alert.alert('Could not delete list', 'Please try again.');
+          }
+        },
+      },
+    ]);
+  }
+
   return (
     <View style={styles.container}>
+      <Pressable onPress={confirmDeleteList} style={styles.deleteListButton}>
+        <Text style={styles.deleteListText}>Delete this list</Text>
+      </Pressable>
       <TextInput
         style={styles.search}
         placeholder="Search"
@@ -64,6 +87,8 @@ export function ListDetailScreen({ route, navigation }: Props) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: theme.colors.background },
+  deleteListButton: { alignSelf: 'flex-end', marginHorizontal: theme.spacing.lg },
+  deleteListText: { color: theme.colors.danger, fontSize: 12 },
   search: {
     margin: theme.spacing.lg,
     backgroundColor: theme.colors.cardBackground,
