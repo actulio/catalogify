@@ -37,10 +37,12 @@ export function ItemFormScreen({ route, navigation }: Props) {
     setSaving(true);
     try {
       const repo = new FirebaseCatalogRepository(user.uid);
+      const photoChanged = photoUri && photoUri !== item?.photoUrl && !photoUri.startsWith('https://');
+      const photoToUpload = photoChanged ? photoUri : undefined;
       if (item) {
-        await repo.updateItem(list.id, item.id, title, values, photoUri);
+        await repo.updateItem(list.id, item.id, title, values, photoToUpload);
       } else {
-        await repo.addItem(list.id, title, values, photoUri);
+        await repo.addItem(list.id, title, values, photoToUpload);
       }
       navigation.goBack();
     } catch {
