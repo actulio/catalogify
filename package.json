@@ -32,7 +32,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest",
+    "test": "jest --selectProjects app",
     "test:emulator": "firebase emulators:exec --only firestore,auth \"jest --selectProjects emulator --forceExit\""
   },
   "private": true,
