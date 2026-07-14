@@ -82,6 +82,25 @@ Implementation should pull in `vercel-react-native-skills` and frontend/mobile d
 >
 > Keep all screens visually consistent with the Warm Editorial palette and card style described above.
 
+### Alternate exploration prompt (generate style options)
+
+Use this instead of the above if you want the AI to propose visual directions rather than apply the confirmed Warm Editorial one:
+
+> **App: Catalogify — personal collection catalog app**
+>
+> A mobile app (Android/iOS, React Native) for cataloging personal collections — coffees tried, wines tasted, fruits eaten, etc. Users create custom lists, each with its own set of fields (text, rating, photo, etc.), then add/search/edit items within each list.
+>
+> **Generate 3 distinct visual style directions** for this app — each with its own color palette, typography choice, and overall mood. Make the directions genuinely different from each other (e.g. one warm/editorial, one bold/minimal, one soft/playful, one dark/premium — pick any 3 that feel distinct), not just palette swaps of the same layout. For each direction, apply it consistently across the screens below and give the direction a short name.
+>
+> **Screens to design (for each style direction):**
+>
+> 1. **Home screen** — "My Catalogs": a 2-column grid of catalog tiles (e.g. Coffees, Wines, Fruits), each tile showing a thumbnail, catalog name, and item count. A "+" tile to create a new catalog.
+> 2. **List detail screen** — inside one catalog (e.g. "Coffees"): a search bar, sort/filter controls (by rating), and a scrollable list of item cards (photo thumbnail, title, rating, one line of secondary text). A floating "+" button to add a new item.
+> 3. **Item form screen (add/edit)** — a form with: title (required text input), photo picker with preview, star/numeric rating selector, short text fields, a longer multi-line "commentary" text area, save/cancel actions.
+> 4. **New list / edit fields screen** — a builder UI where the user names the list and adds fields one at a time, choosing a field type (short text, long text, number, rating, photo, yes/no, date) and label, with reorder/remove controls.
+>
+> Keep information density and layout structure consistent across the 3 directions — only style (color, type, shape, texture) should vary.
+
 ## Image Handling
 
 Client-side resize/compress via `expo-image-manipulator` on pick (camera or gallery via `expo-image-picker`) before upload: target ~1080px longest edge, JPEG quality ~0.7. Only the resized version is stored in Cloud Storage; the original is discarded.
