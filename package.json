@@ -33,10 +33,41 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "test": "jest",
-    "test:emulator": "firebase emulators:exec --only firestore,auth \"jest src/services/FirebaseCatalogRepository.test.ts\""
+    "test:emulator": "firebase emulators:exec --only firestore,auth \"jest --selectProjects emulator --forceExit\""
   },
   "private": true,
   "jest": {
-    "preset": "jest-expo"
+    "projects": [
+      {
+        "displayName": "app",
+        "preset": "jest-expo",
+        "testPathIgnorePatterns": [
+          "/node_modules/",
+          "<rootDir>/src/services/FirebaseCatalogRepository.test.ts"
+        ]
+      },
+      {
+        "displayName": "emulator",
+        "testEnvironment": "node",
+        "testMatch": [
+          "<rootDir>/src/services/FirebaseCatalogRepository.test.ts"
+        ],
+        "transform": {
+          "\\.[jt]sx?$": [
+            "babel-jest",
+            { "presets": ["expo/internal/babel-preset.js"] }
+          ]
+        },
+        "transformIgnorePatterns": [
+          "/node_modules/(?!(firebase|@firebase|expo))"
+        ],
+        "moduleNameMapper": {
+          "^expo-image-manipulator$": "<rootDir>/src/services/__mocks__/expo-image-manipulator.js"
+        },
+        "setupFiles": [
+          "<rootDir>/jest.setup.js"
+        ]
+      }
+    ]
   }
 }
