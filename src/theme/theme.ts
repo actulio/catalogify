@@ -1,30 +1,14 @@
-// src/theme/theme.ts
+// Non-className values for the few RN props NativeWind's `className` can't
+// reach: @expo/vector-icons' `color` prop and Switch.trackColor.
+// tailwind.config.js remains the single source of truth for all Warm Archive
+// tokens — these are kept in sync with it by hand, since there's no
+// cross-runtime way to import Tailwind config values into plain JS props.
 export const theme = {
   colors: {
-    background: '#FAF6F0',
-    cardBackground: '#FFFFFF',
-    border: '#E8DDD0',
-    textPrimary: '#3A2E22',
-    textSecondary: '#8A7A68',
-    accent: '#C9A27A',
-    accentStrong: '#A8895F',
-    danger: '#A83246',
-  },
-  radii: {
-    small: 12,
-    medium: 16,
-    large: 18,
-  },
-  spacing: {
-    xs: 4,
-    sm: 8,
-    md: 12,
-    lg: 16,
-    xl: 24,
-  },
-  fonts: {
-    heading: 'Georgia',
-    body: undefined, // system default sans-serif
+    primary: '#97422f',
+    onSurfaceVariant: '#55423e',
+    outline: '#88726d',
+    danger: '#ba1a1a',
   },
 } as const;
 
