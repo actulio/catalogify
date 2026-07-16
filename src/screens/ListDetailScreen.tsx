@@ -1,12 +1,14 @@
-import { useCallback, useState } from 'react';
-import { View, TextInput, FlatList, Pressable, Text, StyleSheet, Alert } from 'react-native';
+import { useCallback, useLayoutEffect, useState } from 'react';
+import { View, TextInput, FlatList, Pressable, Text, Alert } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { MaterialIcons } from '@expo/vector-icons';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { CatalogItem } from '../domain/types';
 import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository';
 import { useAuth } from '../services/auth';
 import { ItemCard } from '../components/ItemCard';
+import { CatalogActionsSheet } from '../components/CatalogActionsSheet';
 import { theme } from '../theme/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ListDetail'>;
@@ -16,6 +18,8 @@ export function ListDetailScreen({ route, navigation }: Props) {
   const { user } = useAuth();
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [search, setSearch] = useState('');
+  const [sortByRating, setSortByRating] = useState(true);
+  const [actionsVisible, setActionsVisible] = useState(false);
   const ratingField = list.fields.find((f) => f.type === 'rating');
 
   const load = useCallback(() => {
@@ -24,13 +28,27 @@ export function ListDetailScreen({ route, navigation }: Props) {
     repo
       .getItems(list.id, {
         searchText: search || undefined,
-        sortByRatingKey: ratingField?.key,
+        sortByRatingKey: sortByRating ? ratingField?.key : undefined,
         sortDirection: 'desc',
       })
       .then(setItems);
-  }, [user, search, list.id, ratingField]);
+  }, [user, search, list.id, ratingField, sortByRating]);
 
   useFocusEffect(load);
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={() => setActionsVisible(true)}
+          accessibilityLabel="Catalog actions"
+          accessibilityRole="button"
+        >
+          <MaterialIcons name="more-vert" size={24} color={theme.colors.primary} />
+        </Pressable>
+      ),
+    });
+  }, [navigation]);
 
   function confirmDeleteList() {
     if (!user) return;
@@ -53,23 +71,39 @@ export function ListDetailScreen({ route, navigation }: Props) {
   }
 
   return (
-    <View style={styles.container}>
-      <Pressable onPress={confirmDeleteList} style={styles.deleteListButton}>
-        <Text style={styles.deleteListText}>Delete this list</Text>
-      </Pressable>
-      <TextInput
-        style={styles.search}
-        placeholder="Search"
-        value={search}
-        onChangeText={(text) => {
-          setSearch(text);
-          load();
-        }}
-      />
+    <View className="flex-1 bg-background">
+      <View className="px-5 pt-4 flex-row items-center gap-3">
+        <TextInput
+          className="flex-1 bg-surface-container-low rounded-lg p-4 font-body-md text-body-md text-on-surface"
+          placeholder="Search"
+          placeholderClassName="text-surface-dim"
+          value={search}
+          onChangeText={(text) => {
+            setSearch(text);
+            load();
+          }}
+        />
+        {ratingField && (
+          <Pressable
+            onPress={() => setSortByRating((prev) => !prev)}
+            className={`px-3 py-3 rounded-lg border border-outline-variant/40 ${
+              sortByRating ? 'bg-primary' : 'bg-surface-container'
+            }`}
+            accessibilityLabel="Sort by rating"
+            accessibilityRole="button"
+          >
+            <MaterialIcons
+              name="star"
+              size={16}
+              color={sortByRating ? '#ffffff' : theme.colors.onSurfaceVariant}
+            />
+          </Pressable>
+        )}
+      </View>
       <FlatList
         data={items}
         keyExtractor={(i) => i.id}
-        contentContainerStyle={styles.list}
+        contentContainerClassName="px-5 pt-4 pb-24"
         renderItem={({ item }) => (
           <ItemCard
             item={item}
@@ -78,34 +112,22 @@ export function ListDetailScreen({ route, navigation }: Props) {
           />
         )}
       />
-      <Pressable style={styles.fab} onPress={() => navigation.navigate('ItemForm', { list })}>
-        <Text style={styles.fabText}>+</Text>
+      <Pressable
+        onPress={() => navigation.navigate('ItemForm', { list })}
+        className="absolute right-5 bottom-5 w-14 h-14 rounded-full bg-primary items-center justify-center"
+        accessibilityLabel="Add item"
+        accessibilityRole="button"
+      >
+        <MaterialIcons name="add" size={28} color="#ffffff" />
       </Pressable>
+      <CatalogActionsSheet
+        visible={actionsVisible}
+        onClose={() => setActionsVisible(false)}
+        onDelete={() => {
+          setActionsVisible(false);
+          confirmDeleteList();
+        }}
+      />
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background },
-  deleteListButton: { alignSelf: 'flex-end', marginHorizontal: theme.spacing.lg },
-  deleteListText: { color: theme.colors.danger, fontSize: 12 },
-  search: {
-    margin: theme.spacing.lg,
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.radii.small,
-    padding: theme.spacing.md,
-  },
-  list: { paddingHorizontal: theme.spacing.lg, gap: theme.spacing.sm },
-  fab: {
-    position: 'absolute',
-    right: theme.spacing.lg,
-    bottom: theme.spacing.lg,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: theme.colors.accentStrong,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  fabText: { color: '#FFFFFF', fontSize: 28, lineHeight: 30 },
-});
