@@ -1,6 +1,6 @@
-import { Pressable, Text, View, Image, StyleSheet } from 'react-native';
+import { Pressable, Text, View, Image } from 'react-native';
 import { CatalogItem, CatalogList } from '../domain/types';
-import { theme } from '../theme/theme';
+import { StarRating } from './StarRating';
 
 interface Props {
   item: CatalogItem;
@@ -15,41 +15,33 @@ export function ItemCard({ item, list, onPress }: Props) {
   const secondary = secondaryField ? item.values[secondaryField.key] : undefined;
 
   return (
-    <Pressable style={styles.card} onPress={onPress}>
+    <Pressable
+      onPress={onPress}
+      className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl overflow-hidden mb-4"
+    >
       {item.photoUrl ? (
-        <Image source={{ uri: item.photoUrl }} style={styles.thumbnail} />
+        <Image source={{ uri: item.photoUrl }} className="w-full h-48" resizeMode="cover" />
       ) : (
-        <View style={styles.thumbnailPlaceholder} />
+        <View className="w-full h-48 bg-surface-container items-center justify-center">
+          <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
+            No photo
+          </Text>
+        </View>
       )}
-      <View style={styles.body}>
-        <Text style={styles.title}>{item.title}</Text>
+      <View className="p-4 gap-2">
+        <Text className="font-headline-sm text-headline-sm text-on-surface" numberOfLines={2}>
+          {item.title}
+        </Text>
         {rating !== undefined && rating !== null && (
-          <Text style={styles.rating}>{'★'.repeat(Number(rating))}</Text>
+          /* floor: ratings validate as 0..max but aren't constrained to integers; StarRating renders whole stars */
+          <StarRating rating={Math.floor(Number(rating))} max={ratingField?.ratingScale?.max ?? 5} size={13} />
         )}
-        {secondary ? <Text style={styles.secondary}>{String(secondary)}</Text> : null}
+        {secondary ? (
+          <Text className="font-body-md text-body-md text-on-surface-variant" numberOfLines={2}>
+            {String(secondary)}
+          </Text>
+        ) : null}
       </View>
     </Pressable>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.radii.small,
-    padding: theme.spacing.sm,
-    gap: theme.spacing.md,
-    alignItems: 'center',
-  },
-  thumbnail: { width: 48, height: 48, borderRadius: theme.radii.small },
-  thumbnailPlaceholder: {
-    width: 48,
-    height: 48,
-    borderRadius: theme.radii.small,
-    backgroundColor: theme.colors.accent,
-  },
-  body: { flex: 1 },
-  title: { fontFamily: theme.fonts.heading, fontSize: 15, color: theme.colors.textPrimary },
-  rating: { color: theme.colors.accentStrong, fontSize: 12 },
-  secondary: { color: theme.colors.textSecondary, fontSize: 12 },
-});
