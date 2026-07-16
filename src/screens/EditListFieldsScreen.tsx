@@ -45,6 +45,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
       }
       navigation.goBack();
     } catch (error) {
+      console.error('Failed to save list', error);
       Alert.alert('Could not save', 'Please try again.');
     } finally {
       setSaving(false);

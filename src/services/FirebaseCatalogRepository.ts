@@ -8,11 +8,11 @@ import {
   serverTimestamp,
   Timestamp,
 } from 'firebase/firestore';
-import { db, storage } from './firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { db } from './firebase';
+import { supabase, PHOTOS_BUCKET } from './supabase';
 import { CatalogRepository, ItemQuery } from '../domain/CatalogRepository';
 import { CatalogList, CatalogItem, FieldDef, FieldValue } from '../domain/types';
-import { resizeForUpload } from './image';
+import { resizeUnderSizeLimit } from './image';
 import * as ImageManipulator from 'expo-image-manipulator';
 
 function listsCol(uid: string) {
@@ -26,6 +26,11 @@ function itemsCol(uid: string, listId: string) {
 function toMillis(value: unknown): number {
   return value instanceof Timestamp ? value.toMillis() : Date.now();
 }
+
+// Signed URLs are re-generated on every upload (see uploadPhoto), so a long
+// expiry just means existing photoUrl values keep working between edits
+// rather than needing an active refresh mechanism.
+const SIGNED_URL_EXPIRY_SECONDS = 60 * 60 * 24 * 365;
 
 export class FirebaseCatalogRepository implements CatalogRepository {
   constructor(private uid: string) {}
@@ -142,11 +147,19 @@ export class FirebaseCatalogRepository implements CatalogRepository {
 
   private async uploadPhoto(listId: string, itemId: string, photoUri: string): Promise<string> {
     const info = await ImageManipulator.manipulateAsync(photoUri, []);
-    const resized = await resizeForUpload(photoUri, info.width, info.height);
-    const response = await fetch(resized.uri);
-    const blob = await response.blob();
-    const storageRef = ref(storage, `users/${this.uid}/lists/${listId}/items/${itemId}/photo.jpg`);
-    await uploadBytes(storageRef, blob);
-    return getDownloadURL(storageRef);
+    const { data: photoData } = await resizeUnderSizeLimit(photoUri, info.width, info.height);
+    const path = `${this.uid}/lists/${listId}/items/${itemId}/photo.jpg`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(PHOTOS_BUCKET)
+      .upload(path, photoData, { contentType: 'image/jpeg', upsert: true });
+    if (uploadError) throw uploadError;
+
+    const { data, error: signError } = await supabase.storage
+      .from(PHOTOS_BUCKET)
+      .createSignedUrl(path, SIGNED_URL_EXPIRY_SECONDS);
+    if (signError) throw signError;
+
+    return data.signedUrl;
   }
 }

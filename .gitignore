@@ -36,9 +36,16 @@ firestore-debug.log
 .env
 .env*.local
 
+# per-developer Firebase native app config (see README's Google Sign-In setup)
+google-services.json
+GoogleService-Info.plist
+
 # typescript
 *.tsbuildinfo
 
 # generated native folders
 /ios
 /android
+
+# brainstorming session mockups
+.superpowers/

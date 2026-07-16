@@ -1,19 +1,16 @@
 import { useEffect, useState } from 'react';
-import * as Google from 'expo-auth-session/providers/google';
-import * as WebBrowser from 'expo-web-browser';
+import { Platform } from 'react-native';
+import { GoogleSignin, isErrorWithCode, statusCodes } from '@react-native-google-signin/google-signin';
 import { GoogleAuthProvider, onAuthStateChanged, signInWithCredential, signOut, User } from 'firebase/auth';
 import { auth } from './firebase';
 
-WebBrowser.maybeCompleteAuthSession();
+GoogleSignin.configure({
+  webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+});
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
   const [initializing, setInitializing] = useState(true);
-
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    clientId: process.env.EXPO_PUBLIC_GOOGLE_EXPO_CLIENT_ID,
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-  });
 
   useEffect(() => {
     return onAuthStateChanged(auth, (u) => {
@@ -22,18 +19,30 @@ export function useAuth() {
     });
   }, []);
 
-  useEffect(() => {
-    if (response?.type === 'success' && response.authentication?.idToken) {
-      const credential = GoogleAuthProvider.credential(response.authentication.idToken);
-      signInWithCredential(auth, credential);
+  async function signIn() {
+    try {
+      if (Platform.OS === 'android') {
+        await GoogleSignin.hasPlayServices();
+      }
+      const response = await GoogleSignin.signIn();
+      if (response.type !== 'success' || !response.data.idToken) return;
+
+      const credential = GoogleAuthProvider.credential(response.data.idToken);
+      await signInWithCredential(auth, credential);
+    } catch (error) {
+      if (isErrorWithCode(error) && error.code === statusCodes.SIGN_IN_CANCELLED) return;
+      throw error;
     }
-  }, [response]);
+  }
 
   return {
     user,
     initializing,
-    canSignIn: !!request,
-    signIn: () => promptAsync(),
-    signOut: () => signOut(auth),
+    canSignIn: true,
+    signIn,
+    signOut: async () => {
+      await GoogleSignin.signOut();
+      await signOut(auth);
+    },
   };
 }

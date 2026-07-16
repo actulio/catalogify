@@ -45,7 +45,8 @@ export function ItemFormScreen({ route, navigation }: Props) {
         await repo.addItem(list.id, title, values, photoToUpload);
       }
       navigation.goBack();
-    } catch {
+    } catch (error) {
+      console.error('Failed to save item', error);
       Alert.alert('Could not save', 'Please try again.');
     } finally {
       setSaving(false);
@@ -64,7 +65,8 @@ export function ItemFormScreen({ route, navigation }: Props) {
             const repo = new FirebaseCatalogRepository(user.uid);
             await repo.deleteItem(list.id, item.id);
             navigation.goBack();
-          } catch {
+          } catch (error) {
+            console.error('Failed to delete item', error);
             Alert.alert('Could not delete', 'Please try again.');
           }
         },
