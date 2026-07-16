@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Catalogify - Sign In</title>
+<!-- Google Fonts: Playfair Display & Inter -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Playfair+Display:ital,wght@0,600;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#faf9f5",
+                    "primary": "#97422f", // Terracotta base
+                    "terracotta": "#c3644e", // Specific brand terracotta
+                    "espresso": "#2C2421", // Specific espresso from style guidance
+                    "background": "#faf9f5",
+                    "on-primary-container": "#fffbff",
+                    "surface-container-low": "#f4f4f0",
+                    "outline-variant": "#dbc1bb",
+                    "on-surface-variant": "#55423e",
+                    "on-tertiary": "#ffffff",
+                    "surface-container": "#efeeea",
+                    "on-primary-fixed-variant": "#7b2e1c",
+                    "on-tertiary-fixed": "#1d1c15",
+                    "primary-container": "#b65a44",
+                    "tertiary-fixed": "#e7e2d7",
+                    "on-tertiary-container": "#fffbff",
+                    "surface-dim": "#dbdad6",
+                    "on-surface": "#1b1c1a",
+                    "tertiary-container": "#77746b",
+                    "secondary": "#675c58",
+                    "primary-fixed-dim": "#ffb4a3",
+                    "secondary-container": "#ecddd8",
+                    "surface-tint": "#9a4431",
+                    "on-secondary-fixed": "#211a17",
+                    "on-primary-fixed": "#3d0600",
+                    "primary-fixed": "#ffdad2",
+                    "secondary-fixed-dim": "#d2c4bf",
+                    "secondary-fixed": "#eedfda",
+                    "on-secondary": "#ffffff",
+                    "inverse-surface": "#2f312e",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#cbc6bc",
+                    "surface-container-lowest": "#ffffff",
+                    "outline": "#88726d",
+                    "on-background": "#1b1c1a",
+                    "on-tertiary-fixed-variant": "#49473f",
+                    "surface-container-highest": "#e3e2df",
+                    "surface-container-high": "#e9e8e4",
+                    "on-primary": "#ffffff",
+                    "on-secondary-fixed-variant": "#4e4541",
+                    "error": "#ba1a1a",
+                    "on-error-container": "#93000a",
+                    "inverse-primary": "#ffb4a3",
+                    "tertiary": "#5e5c53",
+                    "inverse-on-surface": "#f2f1ed",
+                    "surface-variant": "#e3e2df",
+                    "on-secondary-container": "#6b605d",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#faf9f5"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "8px", // Updated to match user request (8px)
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "margin-desktop": "64px",
+                    "container-max": "1120px",
+                    "unit": "8px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "headline-md": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Playfair Display"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Playfair Display"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #FAF9F5;
+            color: #2C2421;
+        }
+        .text-espresso { color: #2C2421; }
+        .bg-terracotta { background-color: #C3644E; }
+        .text-terracotta { color: #C3644E; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<main class="flex-grow flex flex-col items-center justify-center px-margin-mobile">
+<!-- Background Atmospheric Element (Subtle Gradient Shader) -->
+<div class="fixed inset-0 -z-10 opacity-30 pointer-events-none">
+<!-- Using a subtle shader to enhance the 'editorial' feel without cluttering -->
+
+</div>
+<!-- Logo & Branding Container -->
+<div class="text-center max-w-md w-full animate-fade-in">
+<!-- As per JSON Content Hierarchy: Branding Wordmark -->
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-terracotta mb-4">
+                Catalogify
+            </h1>
+<p class="font-body-md text-body-md text-espresso opacity-80 italic mb-12">
+                "Curate your world, one heirloom at a time."
+            </p>
+<!-- Image Asset for Branding/Vibe -->
+<div class="mb-12 relative group">
+<div class="aspect-[4/3] w-full overflow-hidden rounded-lg border border-espresso/10">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="A beautifully lit, high-end editorial photograph of an antique leather-bound journal and a vintage fountain pen resting on a light wood desk. The scene is bathed in warm, soft sunlight, emphasizing textures of paper and wood. The overall aesthetic is minimalist, warm, and boutique, matching the Catalogify brand identity with a cream and terracotta palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDDDjsl8gNwRLFAL_wx9H48MjkpAtDVhlLCNyLE4eGu7q_1kTWzRrrJW9kmGrT1NcU-pnb7RYutv_YFwUuzANbOsH2IqUeogXLz1liyYFldWKCPppL4eC3KRojBVaC4nJnqp_HlH2DFc9MT5_ungHpkSnH2N4hiIoWPxYXChZAzOYBGLmrENaM7y9go1El4KAv2dI3qTFRInMvfSBXJaYPlRbLCePR3-sK9xyaXe43E61-QbS2Jg6EtYaIBKDJPV4DRYnCdi0ifHsI"/>
+</div>
+<!-- Subtle Tonal Layer border as per Elevation & Depth guide -->
+<div class="absolute inset-0 border border-espresso/5 rounded-lg pointer-events-none"></div>
+</div>
+<!-- Sign In Action -->
+<div class="space-y-6">
+<button class="w-full flex items-center justify-center gap-3 bg-terracotta text-white font-label-md text-label-md py-4 rounded-lg transition-all duration-300 hover:opacity-90 active:scale-[0.98] shadow-sm">
+<!-- Google "G" Icon representation via Material Symbol -->
+<span class="flex items-center justify-center w-6 h-6 bg-white rounded-sm">
+<svg fill="none" height="18" viewbox="0 0 18 18" width="18" xmlns="http://www.w3.org/2000/svg">
+<path d="M17.64 9.20455C17.64 8.56636 17.5827 7.95273 17.4764 7.36364H9V10.845H13.8436C13.635 11.97 13.0009 12.9232 12.0477 13.5614V15.8195H14.9564C16.6582 14.2527 17.64 11.9455 17.64 9.20455Z" fill="#4285F4"></path>
+<path d="M9 18C11.43 18 13.4673 17.1941 14.9564 15.8195L12.0477 13.5614C11.2418 14.1014 10.2109 14.4205 9 14.4205C6.65591 14.4205 4.67182 12.8373 3.96409 10.71H0.957275V13.0418C2.43818 15.9832 5.48182 18 9 18Z" fill="#34A853"></path>
+<path d="M3.96409 10.71C3.78409 10.17 3.68182 9.59318 3.68182 9C3.68182 8.40682 3.78409 7.83 3.96409 7.29V4.95818H0.957275C0.347727 6.17318 0 7.54773 0 9C0 10.4523 0.347727 11.8268 0.957275 13.0418L3.96409 10.71Z" fill="#FBBC05"></path>
+<path d="M9 3.57955C10.3214 3.57955 11.5077 4.03364 12.4405 4.92545L15.0218 2.34409C13.4632 0.891818 11.4259 0 9 0C5.48182 0 2.43818 2.01682 0.957275 4.95818L3.96409 7.29C4.67182 5.16273 6.65591 3.57955 9 3.57955Z" fill="#EA4335"></path>
+</svg>
+</span>
+<span>Sign in with Google</span>
+</button>
+</div>
+</div>
+</main>
+<!-- Global Footer -->
+<footer class="py-12 text-center">
+<p class="font-label-sm text-label-sm text-espresso opacity-50 tracking-widest uppercase">
+            A digital heirloom platform
+        </p>
+</footer>
+<script>
+        // Simple micro-interaction for the sign-in container
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.querySelector('.animate-fade-in');
+            container.style.opacity = '0';
+            container.style.transform = 'translateY(20px)';
+            container.style.transition = 'opacity 1s ease-out, transform 1s ease-out';
+            
+            setTimeout(() => {
+                container.style.opacity = '1';
+                container.style.transform = 'translateY(0)';
+            }, 100);
+        });
+    </script>
+</body></html>

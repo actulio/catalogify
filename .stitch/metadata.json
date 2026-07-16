@@ -1,0 +1,15 @@
+{
+  "projectId": "manual-download",
+  "title": "Catalogify — Warm Archive",
+  "deviceType": "mobile",
+  "lastSyncTime": "2026-07-15T00:00:00Z",
+  "screens": {
+    "home": { "sourceScreen": "home_warm_archive_updated_nav", "mapsTo": "HomeScreen" },
+    "list_detail": { "sourceScreen": "list_detail_warm_archive_updated_nav", "mapsTo": "ListDetailScreen" },
+    "list_builder": { "sourceScreen": "list_builder_warm_archive_updated_nav", "mapsTo": "EditListFieldsScreen" },
+    "catalog_actions_modal": { "sourceScreen": "catalog_actions_modal_warm_archive", "mapsTo": "CatalogActionsSheet" },
+    "sign_in": { "sourceScreen": "sign_in_warm_archive", "mapsTo": "SignInScreen" },
+    "add_edit_item": { "sourceScreen": "add_edit_item_warm_archive_v2", "mapsTo": "ItemFormScreen" }
+  },
+  "note": "Fetched manually via Stitch's web UI, not the MCP get_screen flow — the project's Stitch MCP connection fails tool discovery (can't resolve reference #/$defs/ScreenInstance from id #). See docs/superpowers/specs/2026-07-15-catalogify-redesign-design.md."
+}

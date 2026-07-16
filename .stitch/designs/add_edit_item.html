@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Edit Item - Catalogify</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container": "#efeeea",
+                    "surface-dim": "#dbdad6",
+                    "outline-variant": "#dbc1bb",
+                    "outline": "#88726d",
+                    "on-tertiary-container": "#fffbff",
+                    "on-secondary-fixed": "#211a17",
+                    "on-primary-fixed": "#3d0600",
+                    "background": "#faf9f5",
+                    "surface-tint": "#9a4431",
+                    "secondary-fixed": "#eedfda",
+                    "on-tertiary-fixed-variant": "#49473f",
+                    "on-secondary-container": "#6b605d",
+                    "tertiary-container": "#77746b",
+                    "surface-container-high": "#e9e8e4",
+                    "on-primary-container": "#fffbff",
+                    "primary-fixed-dim": "#ffb4a3",
+                    "inverse-primary": "#ffb4a3",
+                    "surface-container-highest": "#e3e2df",
+                    "surface-variant": "#e3e2df",
+                    "primary": "#97422f",
+                    "primary-container": "#b65a44",
+                    "surface": "#faf9f5",
+                    "inverse-surface": "#2f312e",
+                    "on-tertiary-fixed": "#1d1c15",
+                    "surface-bright": "#faf9f5",
+                    "on-secondary-fixed-variant": "#4e4541",
+                    "surface-container-low": "#f4f4f0",
+                    "secondary-fixed-dim": "#d2c4bf",
+                    "inverse-on-surface": "#f2f1ed",
+                    "on-surface-variant": "#55423e",
+                    "error": "#ba1a1a",
+                    "on-primary-fixed-variant": "#7b2e1c",
+                    "error-container": "#ffdad6",
+                    "tertiary": "#5e5c53",
+                    "tertiary-fixed": "#e7e2d7",
+                    "on-background": "#1b1c1a",
+                    "primary-fixed": "#ffdad2",
+                    "on-surface": "#1b1c1a",
+                    "secondary-container": "#ecddd8",
+                    "on-tertiary": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary": "#675c58",
+                    "on-error": "#ffffff",
+                    "tertiary-fixed-dim": "#cbc6bc",
+                    "on-secondary": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "4px",
+                    "xl": "8px",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "unit": "8px",
+                    "margin-mobile": "20px",
+                    "gutter": "24px",
+                    "container-max": "1120px",
+                    "margin-desktop": "64px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter", "sans-serif"],
+                    "display-lg": ["Playfair Display", "serif"],
+                    "label-sm": ["Inter", "sans-serif"],
+                    "display-lg-mobile": ["Playfair Display", "serif"],
+                    "body-md": ["Inter", "sans-serif"],
+                    "label-md": ["Inter", "sans-serif"],
+                    "headline-md": ["Playfair Display", "serif"],
+                    "headline-sm": ["Playfair Display", "serif"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #faf9f5;
+            color: #1b1c1a;
+            -webkit-font-smoothing: antialiased;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #dbdad6;
+            border-radius: 10px;
+        }
+        .star-rating .material-symbols-outlined {
+            color: #97422f; /* Terracotta */
+            cursor: pointer;
+        }
+        /* Hide default checkbox/radio for custom toggle */
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #97422f;
+        }
+        .toggle-checkbox:checked + .toggle-label .toggle-dot {
+            transform: translateX(100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-on-surface">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 left-0 right-0 h-20 bg-surface/80 backdrop-blur-xl z-50 flex items-center justify-between px-gutter shadow-[0_20px_50px_rgba(46,16,101,0.08)]">
+<button class="text-primary font-label-md text-label-md hover:opacity-70 transition-opacity uppercase tracking-widest">
+            Cancel
+        </button>
+<span class="font-headline-md text-headline-md tracking-tight text-primary">Catalogify</span>
+<button class="text-primary font-label-md text-label-md hover:opacity-70 transition-opacity uppercase tracking-widest">
+            Save
+        </button>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-[800px] mx-auto pt-32 pb-48 px-margin-mobile md:px-0">
+<header class="mb-12">
+<h1 class="font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg text-on-surface mb-2">Edit Item</h1>
+<div class="h-1 w-12 bg-primary rounded-full"></div>
+</header>
+<form class="space-y-10">
+<!-- Item Title Section -->
+<section class="space-y-3">
+<label class="block font-headline-sm text-[12px] uppercase tracking-widest text-on-surface-variant">Item Title</label>
+<input class="w-full bg-transparent border-b-2 border-surface-dim focus:border-primary outline-none py-3 font-headline-sm text-headline-sm transition-colors duration-300 placeholder:text-surface-dim" placeholder="Enter name..." type="text" value="Vintage 1970s Leather Satchel"/>
+</section>
+<!-- Photo Picker -->
+<section class="space-y-3">
+<label class="block font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Gallery Image</label>
+<div class="relative aspect-square md:aspect-[16/9] w-full border-2 border-dashed border-surface-dim rounded-xl bg-surface-container-low flex flex-col items-center justify-center cursor-pointer hover:bg-surface-container transition-colors group">
+<span class="material-symbols-outlined text-4xl text-outline mb-3 group-hover:scale-110 transition-transform">camera_enhance</span>
+<span class="font-label-md text-label-md text-on-surface-variant">Tap to add photo</span>
+<!-- Hidden file input for interaction -->
+<input class="absolute inset-0 opacity-0 cursor-pointer" type="file"/>
+</div>
+</section>
+<!-- Custom Fields Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<!-- Origin/Brand -->
+<section class="space-y-2">
+<label class="block font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Origin/Brand</label>
+<input class="w-full bg-surface-container-low border border-surface-dim rounded-lg p-4 font-body-md text-body-md focus:ring-1 focus:ring-primary outline-none" type="text" value="Heirloom Goods Co."/>
+</section>
+<!-- Quantity -->
+<section class="space-y-2">
+<label class="block font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Batch # / Quantity</label>
+<input class="w-full bg-surface-container-low border border-surface-dim rounded-lg p-4 font-body-md text-body-md focus:ring-1 focus:ring-primary outline-none" type="number" value="1"/>
+</section>
+<!-- Acquisition Date -->
+<section class="space-y-2">
+<label class="block font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Acquisition Date</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border border-surface-dim rounded-lg p-4 font-body-md text-body-md focus:ring-1 focus:ring-primary outline-none appearance-none" type="date" value="2023-11-15"/>
+<span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline pointer-events-none">calendar_today</span>
+</div>
+</section>
+<!-- Rating -->
+<section class="space-y-2">
+<label class="block font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Personal Rating</label>
+<div class="flex items-center space-x-1 py-4 star-rating">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="material-symbols-outlined">star</span>
+</div>
+</section>
+</div>
+<!-- Notes (Full Width) -->
+<section class="space-y-2">
+<label class="block font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Notes &amp; Commentary</label>
+<textarea class="w-full bg-surface-container-low border border-surface-dim rounded-xl p-4 font-body-md text-body-md focus:ring-1 focus:ring-primary outline-none resize-none custom-scrollbar" placeholder="Describe the story behind this item..." rows="5">Acquired at the Portobello Road Market. The leather has a beautiful patina that only comes with decades of use. Interior lining is intact.</textarea>
+</section>
+<!-- Toggle (Publicly Shared) -->
+<section class="flex items-center justify-between py-4 border-y border-surface-dim/30">
+<div class="space-y-1">
+<label class="block font-label-md text-label-md uppercase tracking-widest text-on-surface-variant">Publicly Shared?</label>
+<p class="text-[12px] text-outline">Make this item visible in your public catalog</p>
+</div>
+<div class="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 border-transparent appearance-none cursor-pointer z-10" id="toggle" name="toggle" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-dim cursor-pointer transition-colors duration-300 relative" for="toggle">
+<span class="toggle-dot block h-full w-1/2 bg-white rounded-full transition-transform duration-300"></span>
+</label>
+</div>
+</section>
+</form>
+<!-- Form Actions -->
+<div class="mt-20 space-y-6 flex flex-col items-center">
+<button class="w-full max-w-md bg-primary text-on-primary font-label-md text-label-md py-5 rounded-xl shadow-lg active:scale-95 transition-all duration-300 uppercase tracking-widest">
+                Save Changes
+            </button>
+<button class="font-label-md text-label-md text-error hover:opacity-80 transition-opacity uppercase tracking-widest flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+                Delete Item
+            </button>
+</div>
+</main>
+<!-- Interactive Layer: Simple Star Rating & Toggle Logic -->
+<script>
+        // Star rating micro-interaction
+        const stars = document.querySelectorAll('.star-rating .material-symbols-outlined');
+        stars.forEach((star, index) => {
+            star.addEventListener('click', () => {
+                stars.forEach((s, i) => {
+                    if (i <= index) {
+                        s.style.fontVariationSettings = "'FILL' 1";
+                    } else {
+                        s.style.fontVariationSettings = "'FILL' 0";
+                    }
+                });
+            });
+        });
+
+        // Floating Save Button appearance on scroll (Optional UX touch)
+        window.addEventListener('scroll', () => {
+            const header = document.querySelector('header');
+            if (window.scrollY > 20) {
+                header.classList.add('shadow-md');
+            } else {
+                header.classList.remove('shadow-md');
+            }
+        });
+    </script>
+<!-- Material Symbol script requirement -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+</body></html>

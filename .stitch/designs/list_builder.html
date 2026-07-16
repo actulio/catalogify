@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Catalogify - Create New Catalog</title>
+<!-- Google Fonts: Playfair Display for Serif, Inter for Sans, Quicksand for specific nav styles -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Inter:wght@400;500;600&amp;family=Quicksand:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#5e5c53",
+                    "on-primary-fixed": "#3d0600",
+                    "on-primary-fixed-variant": "#7b2e1c",
+                    "secondary-fixed": "#eedfda",
+                    "outline": "#88726d",
+                    "primary-container": "#b65a44",
+                    "inverse-surface": "#2f312e",
+                    "surface-container-high": "#e9e8e4",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f2f1ed",
+                    "on-secondary-fixed": "#211a17",
+                    "tertiary-container": "#77746b",
+                    "on-surface": "#1b1c1a",
+                    "surface-variant": "#e3e2df",
+                    "tertiary-fixed-dim": "#cbc6bc",
+                    "secondary": "#675c58",
+                    "secondary-container": "#ecddd8",
+                    "on-secondary-container": "#6b605d",
+                    "on-surface-variant": "#55423e",
+                    "surface-dim": "#dbdad6",
+                    "on-tertiary-fixed": "#1d1c15",
+                    "background": "#faf9f5",
+                    "surface-tint": "#9a4431",
+                    "surface-container-highest": "#e3e2df",
+                    "on-background": "#1b1c1a",
+                    "on-secondary-fixed-variant": "#4e4541",
+                    "inverse-primary": "#ffb4a3",
+                    "on-primary-container": "#fffbff",
+                    "primary-fixed-dim": "#ffb4a3",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#d2c4bf",
+                    "on-secondary": "#ffffff",
+                    "primary": "#97422f",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#ffdad2",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f4f4f0",
+                    "on-tertiary-fixed-variant": "#49473f",
+                    "on-tertiary-container": "#fffbff",
+                    "outline-variant": "#dbc1bb",
+                    "surface-container": "#efeeea",
+                    "surface-bright": "#faf9f5",
+                    "surface": "#faf9f5",
+                    "tertiary-fixed": "#e7e2d7",
+                    "surface-container-lowest": "#ffffff",
+                    // Custom Soft Playful Nav Colors
+                    "nav-bg": "#fef7ff",
+                    "nav-active-bg": "#f3e8ff",
+                    "nav-active-text": "#635b6e",
+                    "nav-inactive-text": "#49454c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem",
+                    "nav-pill": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1120px",
+                    "margin-mobile": "20px",
+                    "unit": "8px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Playfair Display"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "nav-quicksand": ["Quicksand"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .drag-ghost {
+            opacity: 0.5;
+            background: #f4f4f0;
+        }
+        input:focus {
+            outline: none;
+            border-bottom-color: #97422f !important;
+        }
+        .field-card {
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s ease;
+        }
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen font-body-md">
+<!-- Top Navigation Header -->
+<header class="w-full top-0 bg-background flex justify-between items-center px-margin-mobile md:px-margin-desktop py-6 max-w-container-max mx-auto">
+<button class="flex items-center gap-2 text-secondary hover:opacity-80 transition-opacity active:scale-95 duration-200" onclick="history.back()">
+<span class="material-symbols-outlined">close</span>
+<span class="font-label-md text-label-md hidden md:block">Cancel</span>
+</button>
+<h1 class="font-headline-sm text-headline-sm text-primary">Create New Catalog</h1>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 active:scale-95 duration-200">
+            Save
+        </button>
+</header>
+<main class="max-w-[800px] mx-auto px-margin-mobile md:px-margin-desktop pb-32">
+<!-- Hero Section / Title Input -->
+<section class="mt-12 mb-16">
+<label class="block font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-4">Catalog Identity</label>
+<input class="w-full bg-transparent border-t-0 border-l-0 border-r-0 border-b-2 border-secondary/20 font-display-lg-mobile md:font-display-lg text-display-lg-mobile md:text-display-lg py-4 placeholder:text-secondary/20 focus:ring-0 focus:border-primary transition-all" placeholder="Catalog Name" type="text"/>
+<p class="mt-4 font-body-md text-body-md text-secondary opacity-70">Define the theme of your collection. This will be the cover of your digital heirloom.</p>
+</section>
+<!-- Fields Builder -->
+<section>
+<div class="flex justify-between items-end mb-8">
+<div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Attributes &amp; Schema</h2>
+<p class="font-body-md text-body-md text-secondary">Define the data points for each entry in this catalog.</p>
+</div>
+</div>
+<div class="space-y-4 mb-12" id="fields-container">
+<!-- Field Item 1 -->
+<div class="field-card flex items-center gap-4 bg-surface-container-low p-6 border border-secondary/10 group">
+<div class="cursor-grab active:cursor-grabbing text-secondary/40 group-hover:text-secondary/80 transition-colors">
+<span class="material-symbols-outlined">drag_indicator</span>
+</div>
+<div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+<input class="bg-transparent border-0 border-b border-secondary/10 font-label-md text-label-md focus:ring-0 py-1" placeholder="Label" type="text" value="Title"/>
+<div class="flex items-center justify-between gap-4">
+<div class="flex items-center gap-2 bg-white/50 px-3 py-1 border border-secondary/10 text-secondary">
+<span class="material-symbols-outlined text-[20px]">short_text</span>
+<span class="font-label-sm text-label-sm">Text</span>
+</div>
+<button class="text-secondary/40 hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Field Item 2 -->
+<div class="field-card flex items-center gap-4 bg-surface-container-low p-6 border border-secondary/10 group">
+<div class="cursor-grab text-secondary/40 group-hover:text-secondary/80 transition-colors">
+<span class="material-symbols-outlined">drag_indicator</span>
+</div>
+<div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+<input class="bg-transparent border-0 border-b border-secondary/10 font-label-md text-label-md focus:ring-0 py-1" placeholder="Label" type="text" value="Acquisition Date"/>
+<div class="flex items-center justify-between gap-4">
+<div class="flex items-center gap-2 bg-white/50 px-3 py-1 border border-secondary/10 text-secondary">
+<span class="material-symbols-outlined text-[20px]">calendar_today</span>
+<span class="font-label-sm text-label-sm">Date</span>
+</div>
+<button class="text-secondary/40 hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Field Item 3 -->
+<div class="field-card flex items-center gap-4 bg-surface-container-low p-6 border border-secondary/10 group">
+<div class="cursor-grab text-secondary/40 group-hover:text-secondary/80 transition-colors">
+<span class="material-symbols-outlined">drag_indicator</span>
+</div>
+<div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+<input class="bg-transparent border-0 border-b border-secondary/10 font-label-md text-label-md focus:ring-0 py-1" placeholder="Label" type="text" value="Personal Rating"/>
+<div class="flex items-center justify-between gap-4">
+<div class="flex items-center gap-2 bg-white/50 px-3 py-1 border border-secondary/10 text-secondary">
+<span class="material-symbols-outlined text-[20px]">grade</span>
+<span class="font-label-sm text-label-sm">Rating</span>
+</div>
+<button class="text-secondary/40 hover:text-error transition-colors p-1">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Add Field Actions -->
+<div class="border-2 border-dashed border-secondary/10 p-8 flex flex-col items-center justify-center space-y-6">
+<span class="font-label-md text-label-md text-secondary/60">Choose a field type to add</span>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-lg">
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-highest/30 border border-secondary/5 hover:border-primary/40 hover:bg-surface-container transition-all group active:scale-95">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary mb-2">short_text</span>
+<span class="font-label-sm text-label-sm text-secondary">Text</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-highest/30 border border-secondary/5 hover:border-primary/40 hover:bg-surface-container transition-all group active:scale-95">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary mb-2">pin</span>
+<span class="font-label-sm text-label-sm text-secondary">Number</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-highest/30 border border-secondary/5 hover:border-primary/40 hover:bg-surface-container transition-all group active:scale-95">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary mb-2">photo_camera</span>
+<span class="font-label-sm text-label-sm text-secondary">Photo</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-highest/30 border border-secondary/5 hover:border-primary/40 hover:bg-surface-container transition-all group active:scale-95">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary mb-2">star_half</span>
+<span class="font-label-sm text-label-sm text-secondary">Rating</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-highest/30 border border-secondary/5 hover:border-primary/40 hover:bg-surface-container transition-all group active:scale-95">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary mb-2">calendar_today</span>
+<span class="font-label-sm text-label-sm text-secondary">Date</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-highest/30 border border-secondary/5 hover:border-primary/40 hover:bg-surface-container transition-all group active:scale-95">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary mb-2">link</span>
+<span class="font-label-sm text-label-sm text-secondary">Link</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-highest/30 border border-secondary/5 hover:border-primary/40 hover:bg-surface-container transition-all group active:scale-95">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary mb-2">inventory_2</span>
+<span class="font-label-sm text-label-sm text-secondary">Select</span>
+</button>
+<button class="flex flex-col items-center justify-center p-4 bg-surface-container-highest/30 border border-secondary/5 hover:border-primary/40 hover:bg-surface-container transition-all group active:scale-95">
+<span class="material-symbols-outlined text-secondary group-hover:text-primary mb-2">more_horiz</span>
+<span class="font-label-sm text-label-sm text-secondary">More</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Advanced Options Section -->
+<section class="mt-20">
+<h3 class="font-label-sm text-label-sm text-secondary uppercase tracking-widest mb-6">Visual Style</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="bg-surface-container-low p-6 border border-secondary/10 flex items-start gap-4">
+<div class="w-12 h-12 bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">palette</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">Theme Color</h4>
+<p class="font-label-sm text-label-sm text-secondary mb-4">Set the accent color for this specific catalog.</p>
+<div class="flex gap-2">
+<button class="w-6 h-6 rounded-full bg-primary ring-2 ring-offset-2 ring-primary"></button>
+<button class="w-6 h-6 rounded-full bg-secondary-fixed"></button>
+<button class="w-6 h-6 rounded-full bg-tertiary"></button>
+<button class="w-6 h-6 rounded-full bg-outline"></button>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low p-6 border border-secondary/10 flex items-start gap-4">
+<div class="w-12 h-12 bg-primary/10 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">grid_view</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">Default View</h4>
+<p class="font-label-sm text-label-sm text-secondary mb-4">How entries should be displayed by default.</p>
+<select class="bg-white/50 border border-secondary/10 font-label-sm text-label-sm py-1 pl-2 pr-8 focus:ring-primary focus:border-primary">
+<option>Editorial Grid</option>
+<option>Detailed List</option>
+<option>Minimal Table</option>
+</select>
+</div>
+</div>
+</div>
+</section>
+<!-- Large Desktop CTA -->
+<div class="hidden md:block mt-16 text-center">
+<button class="w-full max-w-md bg-primary text-on-primary py-4 rounded-lg font-label-md text-label-md tracking-wider active:scale-95 transition-all">
+                CREATE CATALOG
+            </button>
+</div>
+</main>
+<!-- Bottom Navigation Bar (Updated to Soft Playful Style) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-4 bg-nav-bg shadow-[0_-10px_40px_rgba(46,16,101,0.08)] rounded-t-[2rem] font-nav-quicksand">
+<a class="flex flex-col items-center justify-center text-nav-inactive-text p-2 hover:bg-nav-active-bg/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[12px] font-bold mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-nav-active-bg text-nav-active-text rounded-full px-6 py-2 scale-110 shadow-sm" href="#">
+<span class="material-symbols-outlined">auto_stories</span>
+<span class="text-[12px] font-bold mt-1">Catalog</span>
+</a>
+<a class="flex flex-col items-center justify-center text-nav-inactive-text p-2 hover:bg-nav-active-bg/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">favorite</span>
+<span class="text-[12px] font-bold mt-1">Saved</span>
+</a>
+<a class="flex flex-col items-center justify-center text-nav-inactive-text p-2 hover:bg-nav-active-bg/50 rounded-full transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[12px] font-bold mt-1">Settings</span>
+</a>
+</nav>
+<script>
+        // Simple Interaction: Mock Adding a Field
+        const addFieldButtons = document.querySelectorAll('button.group');
+        const container = document.getElementById('fields-container');
+
+        addFieldButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const labelText = btn.querySelector('span:last-child').textContent;
+                const iconName = btn.querySelector('span:first-child').textContent;
+                
+                const newField = document.createElement('div');
+                newField.className = "field-card flex items-center gap-4 bg-surface-container-low p-6 border border-secondary/10 group opacity-0 translate-y-4";
+                newField.innerHTML = `
+                    <div class="cursor-grab text-secondary/40 group-hover:text-secondary/80 transition-colors">
+                        <span class="material-symbols-outlined">drag_indicator</span>
+                    </div>
+                    <div class="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" value="New ${labelText}" class="bg-transparent border-0 border-b border-secondary/10 font-label-md text-label-md focus:ring-0 py-1" placeholder="Label">
+                        <div class="flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-2 bg-white/50 px-3 py-1 border border-secondary/10 text-secondary">
+                                <span class="material-symbols-outlined text-[20px]">${iconName}</span>
+                                <span class="font-label-sm text-label-sm">${labelText}</span>
+                            </div>
+                            <button class="remove-btn text-secondary/40 hover:text-error transition-colors p-1">
+                                <span class="material-symbols-outlined">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(newField);
+                
+                // Animate in
+                requestAnimationFrame(() => {
+                    newField.classList.remove('opacity-0', 'translate-y-4');
+                    newField.classList.add('transition-all', 'duration-300');
+                });
+
+                // Re-bind remove listeners
+                newField.querySelector('.remove-btn').addEventListener('click', () => {
+                    newField.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => newField.remove(), 300);
+                });
+            });
+        });
+
+        // Initialize remove for existing items
+        document.querySelectorAll('.remove-btn, .text-secondary\\/40.hover\\:text-error').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const card = e.target.closest('.field-card');
+                if (card) {
+                    card.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => card.remove(), 300);
+                }
+            });
+        });
+    </script>
+</body></html>

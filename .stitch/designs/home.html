@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Catalogify - My Catalogs</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&amp;family=Inter:wght@400;500;600&amp;family=Quicksand:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Icons -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#5e5c53",
+                    "on-primary-fixed": "#3d0600",
+                    "on-primary-fixed-variant": "#7b2e1c",
+                    "secondary-fixed": "#eedfda",
+                    "outline": "#88726d",
+                    "primary-container": "#b65a44",
+                    "inverse-surface": "#2f312e",
+                    "surface-container-high": "#e9e8e4",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f2f1ed",
+                    "on-secondary-fixed": "#211a17",
+                    "tertiary-container": "#77746b",
+                    "on-surface": "#1b1c1a",
+                    "surface-variant": "#e3e2df",
+                    "tertiary-fixed-dim": "#cbc6bc",
+                    "secondary": "#675c58",
+                    "secondary-container": "#ecddd8",
+                    "on-secondary-container": "#6b605d",
+                    "on-surface-variant": "#55423e",
+                    "surface-dim": "#dbdad6",
+                    "on-tertiary-fixed": "#1d1c15",
+                    "background": "#faf9f5",
+                    "surface-tint": "#9a4431",
+                    "surface-container-highest": "#e3e2df",
+                    "on-background": "#1b1c1a",
+                    "on-secondary-fixed-variant": "#4e4541",
+                    "inverse-primary": "#ffb4a3",
+                    "on-primary-container": "#fffbff",
+                    "primary-fixed-dim": "#ffb4a3",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#d2c4bf",
+                    "on-secondary": "#ffffff",
+                    "primary": "#97422f",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#ffdad2",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f4f4f0",
+                    "on-tertiary-fixed-variant": "#49473f",
+                    "on-tertiary-container": "#fffbff",
+                    "outline-variant": "#dbc1bb",
+                    "surface-container": "#efeeea",
+                    "surface-bright": "#faf9f5",
+                    "surface": "#faf9f5",
+                    "tertiary-fixed": "#e7e2d7",
+                    "surface-container-lowest": "#ffffff",
+                    // New Nav Colors from Soft Playful
+                    "nav-surface": "#fef7ff",
+                    "nav-active-container": "#f3e8ff",
+                    "nav-active-content": "#635b6e",
+                    "nav-inactive": "#49454c"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem",
+                    "pill": "9999px"
+            },
+            "spacing": {
+                    "container-max": "1120px",
+                    "margin-mobile": "20px",
+                    "unit": "8px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Playfair Display"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "quicksand": ["Quicksand"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .catalog-card-hover:hover .image-overlay {
+            opacity: 0.1;
+        }
+        body {
+            background-color: #faf9f5;
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+</head>
+<body class="text-on-background font-body-md antialiased">
+<!-- TopAppBar -->
+<header class="w-full top-0 bg-background dark:bg-background border-b border-secondary/10 sticky z-50">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 duration-200 hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">menu</span>
+</button>
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-primary dark:text-primary-fixed-dim">Catalogify</h1>
+</div>
+<div class="flex items-center gap-6">
+<button class="hidden md:block text-primary font-bold hover:opacity-80 transition-opacity font-label-md text-label-md">Archive</button>
+<button class="hidden md:block text-secondary hover:opacity-80 transition-opacity font-label-md text-label-md">Collections</button>
+<button class="active:scale-95 duration-200 hover:opacity-80 transition-opacity">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim">search</span>
+</button>
+</div>
+</div>
+</header>
+<!-- Main Content -->
+<main class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 md:py-20 min-h-screen">
+<!-- Header Section -->
+<div class="mb-12">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-2">My Catalogs</h2>
+<div class="h-1 w-12 bg-primary"></div>
+</div>
+<!-- Bento-style Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter">
+<!-- New Catalog Action Tile -->
+<button class="group relative aspect-[4/5] border-2 border-dashed border-outline-variant flex flex-col items-center justify-center gap-4 hover:border-primary hover:bg-surface-container-low transition-all duration-300 rounded-lg active:scale-95">
+<div class="w-16 h-16 rounded-full border border-outline-variant flex items-center justify-center group-hover:border-primary group-hover:bg-primary/5 transition-colors">
+<span class="material-symbols-outlined text-outline group-hover:text-primary text-3xl">add</span>
+</div>
+<span class="font-label-md text-label-md text-secondary group-hover:text-primary uppercase tracking-widest">New Catalog</span>
+</button>
+<!-- Coffee Catalog Tile -->
+<div class="catalog-card-hover group relative aspect-[4/5] bg-surface-container overflow-hidden rounded-lg cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A warm, editorial style photograph of a roasted coffee bean collection on a minimalist cream background. Soft morning light creates gentle shadows. The palette features rich espresso browns and warm terracotta tones, echoing a premium boutique journal aesthetic. A single porcelain spoon rests beside the beans." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCW7e5E0AsROsb0oluIgeWqqOmTc1_Qai4NLHnh-NppxLYCRDnTd6Qz5uFzsP92JVqHy2C8a-GEey20SHJBc6gaq5uy3XhgdLHv71f85lDL3cF1riQSlOST5H15pALTmxjqbOOgCQryY1kp3Y6pj1KHvD6oa8pka4QmAGdw2Gt3ICKa0ClqDFAeZ4y8Yr_jWnlQICs_kJI-8LMI5sARqmJhO5I7Fh3s_ZkKeAJpL-sxNO0yjkKTzLMpA_uHL_ZxYTDCx80f4oYVLgU')"></div>
+<div class="image-overlay absolute inset-0 bg-on-secondary-fixed/20 transition-opacity duration-300"></div>
+<div class="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-on-secondary-fixed/80 to-transparent">
+<h3 class="font-headline-sm text-headline-sm text-surface-container-lowest mb-1">Coffees</h3>
+<p class="font-label-sm text-label-sm text-surface-container-high/90 uppercase tracking-tighter">42 Items</p>
+</div>
+<div class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-surface-container-lowest">arrow_outward</span>
+</div>
+</div>
+<!-- Wines Catalog Tile -->
+<div class="catalog-card-hover group relative aspect-[4/5] bg-surface-container overflow-hidden rounded-lg cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A close-up, high-end editorial shot of deep red wine swirling in a crystal glass. The setting is a bright, airy cellar with minimalist architectural lines. The lighting is soft and diffused, emphasizing the rich terracotta and mahogany hues of the liquid. The aesthetic is clean and modern, resembling a luxury lifestyle magazine." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuASi2XNFWNKD72RTuSlemTqGLj9loxT97k0O8dLedN_XmQmsMOJsao7dsXnP25Caj9BSeYVvfk1BOcW92sV_b5oRSQisYcReeboHj9k4iqBEdpaXu-QZrkbqzkVjUI288eRLpadDSunUXSLxn_ZhfhsUgGGX2V5Xu9I1ONKArKqzmM9tYJ0gKl_NR5hGXOF1z-BFjis1VIG7iZIcobGQSOAX1wn7ldV2DxRaRNp6-h4Fhda9TsfaUuzf_CnwI3e1aYPEqCEmznYCSg')"></div>
+<div class="image-overlay absolute inset-0 bg-on-secondary-fixed/20 transition-opacity duration-300"></div>
+<div class="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-on-secondary-fixed/80 to-transparent">
+<h3 class="font-headline-sm text-headline-sm text-surface-container-lowest mb-1">Wines</h3>
+<p class="font-label-sm text-label-sm text-surface-container-high/90 uppercase tracking-tighter">18 Items</p>
+</div>
+<div class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-surface-container-lowest">arrow_outward</span>
+</div>
+</div>
+<!-- Fruits Catalog Tile -->
+<div class="catalog-card-hover group relative aspect-[4/5] bg-surface-container overflow-hidden rounded-lg cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A meticulously curated arrangement of exotic citrus fruits on a stone surface. The composition uses high whitespace and an editorial grid layout. Soft, natural side-lighting highlights the textures of the rinds. The color palette is dominated by muted oranges and soft creams, conveying a 'slow tech' and intentional vibe." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCGfjkmi8Qg8sGmDAEdx4BNVqcsUeklzbIeArWNx2RrMysWkWR-dpe3JR3d9tEPUMaTHOEt4in5rdgW5fBCv5a6fXR2L-Xpjzt5q6H6w_yP67HFzTDeUfK0FKEN_xoq0yRg532hOF2Ri4OEl7bNPamh_Wp6WdIq-IwtiIaRjNuafq8P-y-WTP47PP95tqllo8qKOgmgPWeFuplT43ufhrxyhYfjgpHvkdRxiniv45txXsNtH65pbpbgKbvLj9Sgod5PWsM9GkUfbec')"></div>
+<div class="image-overlay absolute inset-0 bg-on-secondary-fixed/20 transition-opacity duration-300"></div>
+<div class="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-on-secondary-fixed/80 to-transparent">
+<h3 class="font-headline-sm text-headline-sm text-surface-container-lowest mb-1">Fruits</h3>
+<p class="font-label-sm text-label-sm text-surface-container-high/90 uppercase tracking-tighter">29 Items</p>
+</div>
+<div class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-surface-container-lowest">arrow_outward</span>
+</div>
+</div>
+<!-- Rare Books (Extra Tile for Grid) -->
+<div class="catalog-card-hover group relative aspect-[4/5] bg-surface-container overflow-hidden rounded-lg cursor-pointer">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A stack of aged, leather-bound books on a dark wood table. A small ray of light hits the gold-embossed titles. The aesthetic is 'Digital Heirloom', blending physical texture with clean, modern focus. Deep shadows and warm highlights emphasize the boutique, curated feel of the collection." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuARb14oSkvHquHGiOgCwKVQDZeNoH-3OxcGZeQ_getyfykaW2F2F2AoqrzU2q4wdkhimI6lMmrs0iEPsxDhNwXKvsLJ6pbIyplST-aISijUjAFKJtEDqbg50J5wfwSkg3BVr8l_mT9PQ3xPIGjdonJXZy5EXb7ZZOeUb_m9_phIXIRrpdAW9lPc_fZMGBDzcpOA6Piq0UPp_w5L2FhGhsYLFKMS6yt1X_Za7-OZXi9FMRQWz8eP961IE0y9L3e-5BbO5cOmAtNCyjY')"></div>
+<div class="image-overlay absolute inset-0 bg-on-secondary-fixed/20 transition-opacity duration-300"></div>
+<div class="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-on-secondary-fixed/80 to-transparent">
+<h3 class="font-headline-sm text-headline-sm text-surface-container-lowest mb-1">Rare Books</h3>
+<p class="font-label-sm text-label-sm text-surface-container-high/90 uppercase tracking-tighter">11 Items</p>
+</div>
+<div class="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity">
+<span class="material-symbols-outlined text-surface-container-lowest">arrow_outward</span>
+</div>
+</div>
+</div>
+<!-- Featured Quote -->
+<section class="mt-24 mb-16 text-center max-w-2xl mx-auto">
+<span class="material-symbols-outlined text-primary-container text-4xl mb-6">format_quote</span>
+<p class="font-headline-sm text-headline-sm text-on-surface-variant italic leading-relaxed">
+                "Curation is the act of giving meaning to the objects we surround ourselves with."
+            </p>
+<p class="font-label-md text-label-md text-outline mt-4 uppercase tracking-[0.2em]">— The Curator's Handbook</p>
+</section>
+</main>
+<!-- Updated BottomNavBar (Soft Playful Style) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-4 bg-nav-surface shadow-[0_-10px_40px_rgba(46,16,101,0.1)] rounded-t-lg font-quicksand">
+<a class="flex flex-col items-center justify-center bg-nav-active-container text-nav-active-content rounded-pill px-6 py-2 scale-105 active:scale-95 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+<span class="text-[12px] font-bold">Archive</span>
+</a>
+<a class="flex flex-col items-center justify-center text-nav-inactive p-2 hover:bg-surface-container-high rounded-pill active:scale-95 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined">shelves</span>
+<span class="text-[12px] font-bold">Collections</span>
+</a>
+<a class="flex flex-col items-center justify-center text-nav-inactive p-2 hover:bg-surface-container-high rounded-pill active:scale-95 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[12px] font-bold">Insights</span>
+</a>
+<a class="flex flex-col items-center justify-center text-nav-inactive p-2 hover:bg-surface-container-high rounded-pill active:scale-95 transition-all duration-300 ease-out" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[12px] font-bold">Profile</span>
+</a>
+</nav>
+<!-- Floating Action Button -->
+<button class="fixed bottom-28 right-6 md:bottom-12 md:right-12 w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg flex items-center justify-center hover:bg-primary-container transition-all active:scale-90 z-40">
+<span class="material-symbols-outlined">add</span>
+</button>
+<script>
+        // Simple micro-interaction for tile scrolling
+        document.addEventListener('DOMContentLoaded', () => {
+            const cards = document.querySelectorAll('.catalog-card-hover');
+            const observerOptions = {
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach((entry, index) => {
+                    if (entry.isIntersecting) {
+                        setTimeout(() => {
+                            entry.target.classList.add('opacity-100', 'translate-y-0');
+                            entry.target.classList.remove('opacity-0', 'translate-y-4');
+                        }, index * 100);
+                    }
+                });
+            }, observerOptions);
+
+            cards.forEach(card => {
+                card.classList.add('opacity-0', 'translate-y-4', 'transition-all', 'duration-500');
+                observer.observe(card);
+            });
+        });
+    </script>
+</body></html>

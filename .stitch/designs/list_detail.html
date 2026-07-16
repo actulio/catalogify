@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Catalogify - Coffees</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&amp;family=Inter:wght@400;500;600&amp;family=Quicksand:wght@500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary": "#5e5c53",
+                    "on-primary-fixed": "#3d0600",
+                    "on-primary-fixed-variant": "#7b2e1c",
+                    "secondary-fixed": "#eedfda",
+                    "outline": "#88726d",
+                    "primary-container": "#b65a44",
+                    "inverse-surface": "#2f312e",
+                    "surface-container-high": "#e9e8e4",
+                    "on-error-container": "#93000a",
+                    "inverse-on-surface": "#f2f1ed",
+                    "on-secondary-fixed": "#211a17",
+                    "tertiary-container": "#77746b",
+                    "on-surface": "#1b1c1a",
+                    "surface-variant": "#e3e2df",
+                    "tertiary-fixed-dim": "#cbc6bc",
+                    "secondary": "#675c58",
+                    "secondary-container": "#ecddd8",
+                    "on-secondary-container": "#6b605d",
+                    "on-surface-variant": "#55423e",
+                    "surface-dim": "#dbdad6",
+                    "on-tertiary-fixed": "#1d1c15",
+                    "background": "#faf9f5",
+                    "surface-tint": "#9a4431",
+                    "surface-container-highest": "#e3e2df",
+                    "on-background": "#1b1c1a",
+                    "on-secondary-fixed-variant": "#4e4541",
+                    "inverse-primary": "#ffb4a3",
+                    "on-primary-container": "#fffbff",
+                    "primary-fixed-dim": "#ffb4a3",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "secondary-fixed-dim": "#d2c4bf",
+                    "on-secondary": "#ffffff",
+                    "primary": "#97422f",
+                    "error": "#ba1a1a",
+                    "primary-fixed": "#ffdad2",
+                    "on-tertiary": "#ffffff",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f4f4f0",
+                    "on-tertiary-fixed-variant": "#49473f",
+                    "on-tertiary-container": "#fffbff",
+                    "outline-variant": "#dbc1bb",
+                    "surface-container": "#efeeea",
+                    "surface-bright": "#faf9f5",
+                    "surface": "#faf9f5",
+                    "tertiary-fixed": "#e7e2d7",
+                    "surface-container-lowest": "#ffffff",
+                    /* Soft Playful Specific Colors for Nav */
+                    "soft-lavender-bg": "#fef7ff",
+                    "soft-lavender-container": "#f3e8ff",
+                    "soft-lavender-text": "#635b6e",
+                    "soft-mint-container": "#caead6",
+                    "soft-mint-text": "#486554"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "container-max": "1120px",
+                    "margin-mobile": "20px",
+                    "unit": "8px",
+                    "margin-desktop": "64px",
+                    "gutter": "24px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Playfair Display"],
+                    "label-md": ["Inter"],
+                    "headline-sm": ["Playfair Display"],
+                    "headline-md": ["Playfair Display"],
+                    "display-lg-mobile": ["Playfair Display"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "quicksand": ["Quicksand"]
+            },
+            "fontSize": {
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-md": ["14px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "headline-sm": ["24px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "headline-md": ["32px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "display-lg-mobile": ["36px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "1", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            user-select: none;
+        }
+        .editorial-shadow {
+            box-shadow: 0 4px 20px -2px rgba(44, 36, 33, 0.05);
+        }
+        body {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        /* Custom Scrollbar for list */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex flex-col font-body-md">
+<!-- TopAppBar from JSON -->
+<header class="w-full top-0 bg-background dark:bg-background border-b border-secondary/10 sticky z-50">
+<div class="flex justify-between items-center px-margin-mobile md:px-margin-desktop py-4 max-w-container-max mx-auto">
+<button class="hover:opacity-80 transition-opacity active:scale-95 duration-200 text-primary">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-display-lg text-display-lg-mobile md:text-display-lg text-primary dark:text-primary-fixed-dim">Catalogify</h1>
+<button class="hover:opacity-80 transition-opacity active:scale-95 duration-200 text-primary">
+<span class="material-symbols-outlined">search</span>
+</button>
+</div>
+</header>
+<main class="flex-grow max-w-container-max mx-auto w-full px-margin-mobile md:px-margin-desktop py-8 md:py-12">
+<!-- Search & Filter Header -->
+<div class="mb-10 space-y-6">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div>
+<span class="font-label-sm text-label-sm text-tertiary uppercase tracking-widest mb-2 block">Curated Archive</span>
+<h2 class="font-headline-md text-headline-md text-on-surface">The Coffee Collection</h2>
+</div>
+<div class="flex items-center gap-4">
+<!-- Rating Filter Tool -->
+<div class="flex items-center bg-surface-container px-4 py-2 rounded shadow-sm border border-secondary/10">
+<span class="font-label-md text-label-md text-on-surface-variant mr-3">Sort by Rating</span>
+<div class="flex gap-1">
+<button class="text-primary active:scale-90 transition-transform"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-primary active:scale-90 transition-transform"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-primary active:scale-90 transition-transform"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-primary active:scale-90 transition-transform"><span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">star</span></button>
+<button class="text-outline active:scale-90 transition-transform"><span class="material-symbols-outlined text-[18px]">star</span></button>
+</div>
+</div>
+</div>
+</div>
+<!-- Integrated Search Bar -->
+<div class="relative group">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-secondary group-focus-within:text-primary transition-colors">
+<span class="material-symbols-outlined">search</span>
+</span>
+<input class="w-full bg-surface-container-low border-b-2 border-outline-variant focus:border-primary px-12 py-4 font-body-md outline-none transition-all placeholder:text-secondary/50" placeholder="Search beans, roasters, or regions..." type="text"/>
+</div>
+</div>
+<!-- Scrollable Item List (Bento-style Cards) -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-gutter pb-24">
+<!-- Card 1 -->
+<div class="group bg-surface-container-lowest border border-secondary/10 overflow-hidden hover:border-primary/30 transition-all duration-300 editorial-shadow">
+<div class="relative h-64 overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A high-angle editorial photograph of roasted Ethiopian coffee beans spread on a rustic wooden table. The lighting is warm and golden, reminiscent of a late afternoon in a boutique roastery. The color palette features deep umbers, rich ochres, and highlights of soft cream. The composition is clean and minimalist, focusing on the texture of the beans." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAZ5J6DkEjh6tP4zcZcAhcG6bE-4ZE4VSaMWwO2R9fbdS08NkD1tOn6ujcim7rxXoBRhU2rXV1X34tR7pP1JYyo26dyficgsqZ2Hb0dO4pZkLt6-LkP7QTpqsOHNcLzL9FbYPfD9gyro6fSMykfQbXd9omHYzZDBqSWRKf6tNWzDXwhaL9YS8MNmCLE70YYNr4wQ-z6eCJnuUallAmQD_zaTd9PfSPE1Js6Nh_tayIpD8AqepUEFLJKd2D9aWcTk08YyxrKeKICjDg')">
+</div>
+<div class="absolute top-4 right-4 bg-background/90 px-2 py-1 flex items-center gap-1 border border-secondary/10">
+<span class="font-label-sm text-label-sm text-on-surface">4.8</span>
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="p-6">
+<p class="font-label-sm text-label-sm text-primary mb-1 uppercase tracking-wider">Light Roast • Yirgacheffe</p>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-3 group-hover:text-primary transition-colors">Floral Ethiopian Heirloom</h3>
+<p class="font-body-md text-body-md text-secondary line-clamp-2">Notes of jasmine, lemon zest, and wild honey. A delicate, tea-like body that defines the classic Yirgacheffe profile.</p>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="group bg-surface-container-lowest border border-secondary/10 overflow-hidden hover:border-primary/30 transition-all duration-300 editorial-shadow">
+<div class="relative h-64 overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A moody, close-up photograph of a matte black ceramic coffee dripper with a white paper filter, sitting atop a glass carafe. The scene is lit with dramatic side lighting, creating deep shadows and bright highlights on the ceramic texture. The aesthetic is sophisticated and boutique, using a palette of charcoal, warm grays, and terracotta accents." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAXhai7gbtVh73RsxA_pmkYA2yUZcwKh1VqZz3tMX7kk6iFP3xtNR-SFeZ_mJ8Cqg3Q8JHEIdgXorQ0gKXd5yPenO-nwglG54ujOiblcocyH0c29_6lziTGC86bUVzW1sKFoNQUxc9FTficWIV1nyeonnoIhAzmEJ-LNpOfXaX03aEye_8gfq-U8kRdOjXO5Y12ealqhZ2jHVI1GwsQXIUH3_MBi4tZa9YBTYUh_-xvF3QNIhaYe_r1FNSqQPlNiCNIBGGDw6TlGrI')">
+</div>
+<div class="absolute top-4 right-4 bg-background/90 px-2 py-1 flex items-center gap-1 border border-secondary/10">
+<span class="font-label-sm text-label-sm text-on-surface">4.5</span>
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="p-6">
+<p class="font-label-sm text-label-sm text-primary mb-1 uppercase tracking-wider">Medium Roast • Colombia</p>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-3 group-hover:text-primary transition-colors">Huila Reserve Espresso</h3>
+<p class="font-body-md text-body-md text-secondary line-clamp-2">A balanced cup featuring rich dark chocolate, toasted almonds, and a subtle red apple acidity.</p>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="group bg-surface-container-lowest border border-secondary/10 overflow-hidden hover:border-primary/30 transition-all duration-300 editorial-shadow">
+<div class="relative h-64 overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="An artistic shot of espresso being poured into a small porcelain cup. The crema is thick and golden-brown, swirling beautifully. The background is a blurred, high-end cafe interior with warm wood panels and brass fixtures. The lighting is soft and inviting, emphasizing a luxurious, slow-tech editorial feeling." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCIctc4oGwbm6dZ4C9liut-AqjFIJgliWCbKv8Iwg5ZRyOscHnuU6_6yM-cKU7UZ4kdWTDLINXVT7m9ldPfCAIDPQ5Y2mSVo6VJ-0FsxqzQJh0MyUcxaYnEuyEvDF4QRJ0x-8Z1Fy3h4EAXjjx_Ez7qwnkCP-2eDRGMLlHIG48fM4jyv83RePGXVmMlVQv2y8U5AnH4lkR2-sMahnzGycbsxYQT9TsCyfVH_BS1fE01FMa-MhNASAdWoS1XnHxA1ZX3CurxhT_lygM')">
+</div>
+<div class="absolute top-4 right-4 bg-background/90 px-2 py-1 flex items-center gap-1 border border-secondary/10">
+<span class="font-label-sm text-label-sm text-on-surface">4.9</span>
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="p-6">
+<p class="font-label-sm text-label-sm text-primary mb-1 uppercase tracking-wider">Dark Roast • Sumatra</p>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-3 group-hover:text-primary transition-colors">Mandheling G1 Triple Pick</h3>
+<p class="font-body-md text-body-md text-secondary line-clamp-2">Intense cedar, sweet tobacco, and earthy undertones with a heavy, syrupy body and low acidity.</p>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="group bg-surface-container-lowest border border-secondary/10 overflow-hidden hover:border-primary/30 transition-all duration-300 editorial-shadow">
+<div class="relative h-64 overflow-hidden">
+<div class="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105" data-alt="A flat lay photograph of several artisan coffee bags with elegant, minimalist typography. The bags are arranged on a clean, cream-colored linen cloth with a sprig of dried lavender. The lighting is bright and diffuse, creating a serene, high-whitespace aesthetic. The colors are muted earth tones like sage, sand, and espresso." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDqEjt6KR3a3xZMVa_Bs0jHl_pftHngG7an-Ce9FAv8BHlBfaovxSJiigjdwdbVcoZYGj7EI5K0IwME6HdRRP4dUx5bALxdbPjmNYPgoTTsdjFIadBdhrNLXPACsgnMhhkV2beVM-Wn1s_sbdjlrAf9waX8cQd4TL2XIz0FYPg_tH5DId6N_HZ5eyfgce3ILgdsy_nhSVmIhGgwWyu8k9-LOoe1qPUxWCBXkZOq8aHq9Om5ORkJWnaGv-j8baKZnLnQjSvf56eFC6c')">
+</div>
+<div class="absolute top-4 right-4 bg-background/90 px-2 py-1 flex items-center gap-1 border border-secondary/10">
+<span class="font-label-sm text-label-sm text-on-surface">4.2</span>
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">star</span>
+</div>
+</div>
+<div class="p-6">
+<p class="font-label-sm text-label-sm text-primary mb-1 uppercase tracking-wider">Medium Roast • Brazil</p>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-3 group-hover:text-primary transition-colors">Sul de Minas Bourbon</h3>
+<p class="font-body-md text-body-md text-secondary line-clamp-2">Classic nutty profile with notes of peanut butter, caramel, and a smooth creamy finish.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- FAB: Floating Action Button -->
+<button class="fixed bottom-24 right-6 md:bottom-32 md:right-margin-desktop w-14 h-14 bg-primary text-on-primary rounded-full shadow-lg hover:scale-110 active:scale-90 transition-all z-40 flex items-center justify-center">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+<!-- Bottom Navigation Bar (Soft Playful Style) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-4 bg-soft-lavacy-bg dark:bg-surface-container rounded-t-xl shadow-[0_-10px_40px_rgba(46,16,101,0.08)] bg-white font-quicksand">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-soft-lavender-text/70 p-2 hover:bg-soft-lavender-container/50 rounded-full transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined">home_app_logo</span>
+<span class="text-[12px] font-bold">Home</span>
+</a>
+<!-- Archive (Active) -->
+<a class="flex flex-col items-center justify-center bg-soft-lavender-container text-soft-lavender-text rounded-full px-6 py-2 scale-105 shadow-sm active:scale-95 transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_stories</span>
+<span class="text-[12px] font-bold">Archive</span>
+</a>
+<!-- Collections -->
+<a class="flex flex-col items-center justify-center text-soft-lavender-text/70 p-2 hover:bg-soft-lavender-container/50 rounded-full transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined">shelves</span>
+<span class="text-[12px] font-bold">Groups</span>
+</a>
+<!-- Insights -->
+<a class="flex flex-col items-center justify-center text-soft-lavender-text/70 p-2 hover:bg-soft-lavender-container/50 rounded-full transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-[12px] font-bold">Insights</span>
+</a>
+<!-- Profile -->
+<a class="flex flex-col items-center justify-center text-soft-lavender-text/70 p-2 hover:bg-soft-lavender-container/50 rounded-full transition-colors active:scale-90" href="#">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[12px] font-bold">Profile</span>
+</a>
+</nav>
+<script>
+        // Micro-interaction for rating stars
+        document.querySelectorAll('.rating-star').forEach(star => {
+            star.addEventListener('click', function() {
+                this.classList.toggle('text-primary');
+                this.classList.toggle('text-outline');
+            });
+        });
+
+        // Hide FAB on scroll down, show on scroll up
+        let lastScrollTop = 0;
+        const fab = document.querySelector('.fixed.bottom-24');
+        window.addEventListener('scroll', function() {
+            let st = window.pageYOffset || document.documentElement.scrollTop;
+            if (st > lastScrollTop && st > 100){
+                fab.style.transform = 'translateY(150%)';
+            } else {
+                fab.style.transform = 'translateY(0)';
+            }
+            lastScrollTop = st <= 0 ? 0 : st;
+        }, false);
+    </script>
+</body></html>
