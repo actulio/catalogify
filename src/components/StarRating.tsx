@@ -1,7 +1,7 @@
 import { View, Text } from 'react-native';
 
 export function getStarStates(rating: number, max: number): ('filled' | 'empty')[] {
-  const clamped = Math.max(0, Math.min(rating, max));
+  const clamped = Math.max(0, Math.min(Math.floor(rating), max));
   return Array.from({ length: max }, (_, i) => (i < clamped ? 'filled' : 'empty'));
 }
 

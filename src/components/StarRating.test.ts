@@ -16,4 +16,12 @@ describe('getStarStates', () => {
   it('returns an empty array when max is zero', () => {
     expect(getStarStates(3, 0)).toEqual([]);
   });
+
+  it('floors a fractional rating down to the number of whole stars earned', () => {
+    expect(getStarStates(3.5, 5)).toEqual(['filled', 'filled', 'filled', 'empty', 'empty']);
+  });
+
+  it('floors instead of rounding up near the next whole number', () => {
+    expect(getStarStates(4.9, 5)).toEqual(['filled', 'filled', 'filled', 'filled', 'empty']);
+  });
 });
