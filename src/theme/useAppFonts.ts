@@ -10,16 +10,24 @@ import {
   Inter_600SemiBold,
 } from '@expo-google-fonts/inter';
 
-export function useAppFonts(): boolean {
-  const [playfairLoaded] = usePlayfairDisplayFonts({
+export type AppFontsStatus = {
+  loaded: boolean;
+  error: Error | null;
+};
+
+export function useAppFonts(): AppFontsStatus {
+  const [playfairLoaded, playfairError] = usePlayfairDisplayFonts({
     PlayfairDisplay_600SemiBold,
     PlayfairDisplay_700Bold,
   });
-  const [interLoaded] = useInterFonts({
+  const [interLoaded, interError] = useInterFonts({
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
   });
 
-  return playfairLoaded && interLoaded;
+  return {
+    loaded: playfairLoaded && interLoaded,
+    error: playfairError ?? interError,
+  };
 }

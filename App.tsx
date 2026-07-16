@@ -4,9 +4,14 @@ import { RootNavigator } from './src/navigation/RootNavigator';
 import { useAppFonts } from './src/theme/useAppFonts';
 
 export default function App() {
-  const fontsLoaded = useAppFonts();
+  const { loaded, error } = useAppFonts();
 
-  if (!fontsLoaded) return null;
+  if (error) {
+    console.error('Font loading failed', error);
+    return <RootNavigator />;
+  }
+
+  if (!loaded) return null;
 
   return <RootNavigator />;
 }
