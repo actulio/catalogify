@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, Switch, Image, ScrollView, Alert, StyleSheet } from 'react-native';
+import { ScrollView, View, Text, TextInput, Pressable, Image, Switch, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
@@ -75,36 +75,50 @@ export function ItemFormScreen({ route, navigation }: Props) {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <TextInput
-        style={styles.titleInput}
-        placeholder="Title"
-        value={title}
-        onChangeText={setTitle}
-      />
-      {errors.title ? <Text style={styles.error}>{errors.title}</Text> : null}
+    <ScrollView className="flex-1 bg-background" contentContainerClassName="p-5 gap-8 pb-16">
+      <View className="gap-2">
+        <Text className="font-label-md text-label-sm uppercase tracking-widest text-on-surface-variant">
+          Item Title
+        </Text>
+        <TextInput
+          className="border-b-2 border-surface-dim font-headline-sm text-headline-sm text-on-surface py-3"
+          placeholder="Enter name..."
+          placeholderClassName="text-surface-dim"
+          value={title}
+          onChangeText={setTitle}
+        />
+        {errors.title ? <Text className="text-error text-xs">{errors.title}</Text> : null}
+      </View>
 
       {list.fields.some((f) => f.type === 'photo') && (
-        <Pressable onPress={pickPhoto}>
-          {photoUri ? (
-            <Image source={{ uri: photoUri }} style={styles.photo} />
-          ) : (
-            <View style={styles.photoPlaceholder}>
-              <Text style={styles.photoPlaceholderText}>Add photo</Text>
-            </View>
-          )}
-        </Pressable>
+        <View className="gap-2">
+          <Text className="font-label-md text-label-sm uppercase tracking-widest text-on-surface-variant">
+            Gallery Image
+          </Text>
+          <Pressable onPress={pickPhoto}>
+            {photoUri ? (
+              <Image source={{ uri: photoUri }} className="w-full aspect-square rounded-xl" resizeMode="cover" />
+            ) : (
+              <View className="w-full aspect-square rounded-xl border-2 border-dashed border-surface-dim bg-surface-container-low items-center justify-center">
+                <Text className="font-label-md text-label-md text-on-surface-variant">Tap to add photo</Text>
+              </View>
+            )}
+          </Pressable>
+        </View>
       )}
 
       {list.fields
         .filter((f) => f.type !== 'photo')
         .map((field) => (
-          <View key={field.key} style={styles.fieldBlock}>
-            <Text style={styles.label}>{field.label}</Text>
+          <View key={field.key} className="gap-2">
+            <Text className="font-label-md text-label-sm uppercase tracking-widest text-on-surface-variant">
+              {field.label}
+            </Text>
 
             {(field.type === 'shortText' || field.type === 'number' || field.type === 'date') && (
               <TextInput
-                style={styles.input}
+                className="bg-surface-container-low border border-surface-dim rounded-lg p-4 font-body-md text-body-md text-on-surface"
+                placeholderClassName="text-surface-dim"
                 value={values[field.key] != null ? String(values[field.key]) : ''}
                 onChangeText={(text) =>
                   setValue(field.key, field.type === 'number' ? Number(text) || 0 : text)
@@ -115,8 +129,10 @@ export function ItemFormScreen({ route, navigation }: Props) {
 
             {field.type === 'longText' && (
               <TextInput
-                style={[styles.input, styles.multiline]}
+                className="bg-surface-container-low border border-surface-dim rounded-lg p-4 font-body-md text-body-md text-on-surface min-h-[80px]"
+                placeholderClassName="text-surface-dim"
                 multiline
+                textAlignVertical="top"
                 value={values[field.key] != null ? String(values[field.key]) : ''}
                 onChangeText={(text) => setValue(field.key, text)}
               />
@@ -124,7 +140,8 @@ export function ItemFormScreen({ route, navigation }: Props) {
 
             {field.type === 'rating' && (
               <TextInput
-                style={styles.input}
+                className="bg-surface-container-low border border-surface-dim rounded-lg p-4 font-body-md text-body-md text-on-surface"
+                placeholderClassName="text-surface-dim"
                 keyboardType="numeric"
                 placeholder={`0-${field.ratingScale?.max ?? 10}`}
                 value={values[field.key] != null ? String(values[field.key]) : ''}
@@ -136,60 +153,27 @@ export function ItemFormScreen({ route, navigation }: Props) {
               <Switch
                 value={Boolean(values[field.key])}
                 onValueChange={(v) => setValue(field.key, v)}
+                trackColor={{ true: theme.colors.primary }}
               />
             )}
 
-            {errors[field.key] ? <Text style={styles.error}>{errors[field.key]}</Text> : null}
+            {errors[field.key] ? <Text className="text-error text-xs">{errors[field.key]}</Text> : null}
           </View>
         ))}
 
-      <Pressable style={styles.saveButton} onPress={save} disabled={saving}>
-        <Text style={styles.saveButtonText}>{saving ? 'Saving...' : 'Save'}</Text>
+      <Pressable
+        className={`bg-primary rounded-lg py-4 items-center ${saving ? 'opacity-60' : ''}`}
+        onPress={save}
+        disabled={saving}
+      >
+        <Text className="text-white text-base">{saving ? 'Saving...' : 'Save'}</Text>
       </Pressable>
 
       {item && (
         <Pressable onPress={remove}>
-          <Text style={styles.deleteText}>Delete item</Text>
+          <Text className="text-error text-center">Delete item</Text>
         </Pressable>
       )}
     </ScrollView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background },
-  content: { padding: theme.spacing.lg, gap: theme.spacing.md },
-  titleInput: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.radii.small,
-    padding: theme.spacing.md,
-    fontSize: 16,
-  },
-  fieldBlock: { gap: theme.spacing.xs },
-  label: { fontSize: 12, color: theme.colors.textSecondary },
-  input: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.radii.small,
-    padding: theme.spacing.md,
-  },
-  multiline: { minHeight: 80, textAlignVertical: 'top' },
-  photo: { width: '100%', height: 160, borderRadius: theme.radii.medium },
-  photoPlaceholder: {
-    width: '100%',
-    height: 160,
-    borderRadius: theme.radii.medium,
-    backgroundColor: theme.colors.accent,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  photoPlaceholderText: { color: '#FFFFFF' },
-  error: { color: theme.colors.danger, fontSize: 12 },
-  saveButton: {
-    backgroundColor: theme.colors.accentStrong,
-    borderRadius: theme.radii.medium,
-    paddingVertical: theme.spacing.md,
-    alignItems: 'center',
-  },
-  saveButtonText: { color: '#FFFFFF', fontSize: 16 },
-  deleteText: { color: theme.colors.danger, textAlign: 'center' },
-});
