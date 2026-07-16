@@ -8,6 +8,14 @@ interface Props {
   onPress: () => void;
 }
 
+function formatDateAdded(createdAt: number): string {
+  return `Added ${new Date(createdAt).toLocaleDateString(undefined, {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  })}`;
+}
+
 export function ItemCard({ item, list, onPress }: Props) {
   const ratingField = list.fields.find((f) => f.type === 'rating');
   const rating = ratingField ? item.values[ratingField.key] : undefined;
@@ -33,14 +41,16 @@ export function ItemCard({ item, list, onPress }: Props) {
           {item.title}
         </Text>
         {rating !== undefined && rating !== null && (
-          /* floor: ratings validate as 0..max but aren't constrained to integers; StarRating renders whole stars */
-          <StarRating rating={Math.floor(Number(rating))} max={ratingField?.ratingScale?.max ?? 5} size={13} />
+          <StarRating rating={Number(rating)} max={ratingField?.ratingScale?.max ?? 10} size={15} />
         )}
         {secondary ? (
           <Text className="font-body-md text-body-md text-on-surface-variant" numberOfLines={2}>
             {String(secondary)}
           </Text>
         ) : null}
+        <Text className="font-label-sm text-label-sm text-on-surface-variant opacity-70">
+          {formatDateAdded(item.createdAt)}
+        </Text>
       </View>
     </Pressable>
   );

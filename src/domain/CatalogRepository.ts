@@ -13,6 +13,7 @@ export interface CatalogRepository {
   updateListFields(listId: string, fields: FieldDef[]): Promise<void>;
   deleteList(listId: string): Promise<void>;
 
+  getItemCounts(listIds: string[]): Promise<Record<string, number>>;
   getItems(listId: string, query?: ItemQuery): Promise<CatalogItem[]>;
   addItem(
     listId: string,

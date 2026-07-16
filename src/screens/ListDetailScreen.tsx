@@ -9,16 +9,27 @@ import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository
 import { useAuth } from '../services/auth';
 import { ItemCard } from '../components/ItemCard';
 import { CatalogActionsSheet } from '../components/CatalogActionsSheet';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import { theme } from '../theme/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ListDetail'>;
+
+// Sort cycles: date (newest first, no rating sort) -> rating high-to-low -> rating low-to-high.
+type SortMode = 'date' | 'desc' | 'asc';
+const NEXT_SORT: Record<SortMode, SortMode> = { date: 'desc', desc: 'asc', asc: 'date' };
+const SORT_ARROW: Record<SortMode, keyof typeof MaterialIcons.glyphMap> = {
+  date: 'unfold-more',
+  desc: 'arrow-downward',
+  asc: 'arrow-upward',
+};
 
 export function ListDetailScreen({ route, navigation }: Props) {
   const { list } = route.params;
   const { user } = useAuth();
   const [items, setItems] = useState<CatalogItem[]>([]);
   const [search, setSearch] = useState('');
-  const [sortByRating, setSortByRating] = useState(true);
+  const debouncedSearch = useDebouncedValue(search, 300);
+  const [sortMode, setSortMode] = useState<SortMode>('desc');
   const [actionsVisible, setActionsVisible] = useState(false);
   const ratingField = list.fields.find((f) => f.type === 'rating');
 
@@ -27,12 +38,12 @@ export function ListDetailScreen({ route, navigation }: Props) {
     const repo = new FirebaseCatalogRepository(user.uid);
     repo
       .getItems(list.id, {
-        searchText: search || undefined,
-        sortByRatingKey: sortByRating ? ratingField?.key : undefined,
-        sortDirection: 'desc',
+        searchText: debouncedSearch || undefined,
+        sortByRatingKey: sortMode === 'date' ? undefined : ratingField?.key,
+        sortDirection: sortMode === 'asc' ? 'asc' : 'desc',
       })
       .then(setItems);
-  }, [user, search, list.id, ratingField, sortByRating]);
+  }, [user, debouncedSearch, list.id, ratingField, sortMode]);
 
   useFocusEffect(load);
 
@@ -72,30 +83,42 @@ export function ListDetailScreen({ route, navigation }: Props) {
 
   return (
     <View className="flex-1 bg-background">
-      <View className="px-5 pt-4 flex-row items-center gap-3">
+      <Text
+        className="px-5 pt-4 font-headline-md text-headline-md text-on-surface"
+        numberOfLines={1}
+      >
+        {list.name}
+      </Text>
+      <View className="px-5 pt-3 pb-4 flex-row items-stretch gap-3">
         <TextInput
           className="flex-1 bg-surface-container-low rounded-lg p-4 font-body-md text-body-md text-on-surface"
           placeholder="Search"
           placeholderClassName="text-surface-dim"
           value={search}
-          onChangeText={(text) => {
-            setSearch(text);
-            load();
-          }}
+          onChangeText={setSearch}
         />
         {ratingField && (
           <Pressable
-            onPress={() => setSortByRating((prev) => !prev)}
-            className={`px-3 py-3 rounded-lg border border-outline-variant/40 ${
-              sortByRating ? 'bg-primary' : 'bg-surface-container'
+            onPress={() => setSortMode((prev) => NEXT_SORT[prev])}
+            className={`flex-row items-center justify-center gap-1 px-4 rounded-lg border ${
+              sortMode === 'date' ? 'border-outline-variant/40' : 'border-primary'
             }`}
-            accessibilityLabel="Sort by rating"
+            accessibilityLabel={
+              sortMode === 'date'
+                ? 'Sort by rating'
+                : `Sorted by rating ${sortMode === 'desc' ? 'high to low' : 'low to high'}`
+            }
             accessibilityRole="button"
           >
             <MaterialIcons
               name="star"
-              size={16}
-              color={sortByRating ? '#ffffff' : theme.colors.onSurfaceVariant}
+              size={18}
+              color={sortMode === 'date' ? theme.colors.onSurfaceVariant : theme.colors.primary}
+            />
+            <MaterialIcons
+              name={SORT_ARROW[sortMode]}
+              size={18}
+              color={sortMode === 'date' ? theme.colors.onSurfaceVariant : theme.colors.primary}
             />
           </Pressable>
         )}
@@ -103,7 +126,7 @@ export function ListDetailScreen({ route, navigation }: Props) {
       <FlatList
         data={items}
         keyExtractor={(i) => i.id}
-        contentContainerClassName="px-5 pt-4 pb-24"
+        contentContainerClassName="px-5 pb-24"
         renderItem={({ item }) => (
           <ItemCard
             item={item}
@@ -123,6 +146,10 @@ export function ListDetailScreen({ route, navigation }: Props) {
       <CatalogActionsSheet
         visible={actionsVisible}
         onClose={() => setActionsVisible(false)}
+        onEdit={() => {
+          setActionsVisible(false);
+          navigation.navigate('EditListFields', { list });
+        }}
         onDelete={() => {
           setActionsVisible(false);
           confirmDeleteList();

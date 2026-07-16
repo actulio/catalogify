@@ -17,7 +17,7 @@ export function ListTile({ list, itemCount, onPress }: Props) {
         {list.name}
       </Text>
       <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-tighter mt-1">
-        {itemCount} items
+        {itemCount} {itemCount === 1 ? 'item' : 'items'}
       </Text>
     </Pressable>
   );

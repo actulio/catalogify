@@ -1,6 +1,7 @@
 import {
   collection,
   doc,
+  getCountFromServer,
   getDocs,
   setDoc,
   updateDoc,
@@ -59,6 +60,16 @@ export class FirebaseCatalogRepository implements CatalogRepository {
     const items = await getDocs(itemsCol(this.uid, listId));
     await Promise.all(items.docs.map((d) => deleteDoc(d.ref)));
     await deleteDoc(doc(listsCol(this.uid), listId));
+  }
+
+  async getItemCounts(listIds: string[]): Promise<Record<string, number>> {
+    const entries = await Promise.all(
+      listIds.map(async (listId) => {
+        const snap = await getCountFromServer(itemsCol(this.uid, listId));
+        return [listId, snap.data().count] as const;
+      })
+    );
+    return Object.fromEntries(entries);
   }
 
   async getItems(listId: string, query: ItemQuery = {}): Promise<CatalogItem[]> {

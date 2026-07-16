@@ -8,6 +8,7 @@ export const theme = {
     primary: '#97422f',
     onSurfaceVariant: '#55423e',
     outline: '#88726d',
+    outlineVariant: '#dbc1bb',
     danger: '#ba1a1a',
   },
 } as const;

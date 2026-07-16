@@ -1,5 +1,5 @@
-import { useCallback, useState } from 'react';
-import { FlatList, Pressable, Text, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -15,19 +15,59 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 export function HomeScreen({ navigation }: Props) {
   const { user } = useAuth();
   const [lists, setLists] = useState<CatalogList[]>([]);
+  const [counts, setCounts] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+
+  const filteredLists = useMemo(() => {
+    const needle = search.trim().toLowerCase();
+    if (!needle) return lists;
+    return lists.filter((l) => l.name.toLowerCase().includes(needle));
+  }, [lists, search]);
 
   useFocusEffect(
     useCallback(() => {
       if (!user) return;
+      let active = true;
       const repo = new FirebaseCatalogRepository(user.uid);
-      repo.getLists().then(setLists);
+      setLoading(true);
+      repo
+        .getLists()
+        .then(async (fetched) => {
+          if (!active) return;
+          setLists(fetched);
+          setCounts(await repo.getItemCounts(fetched.map((l) => l.id)));
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+      return () => {
+        active = false;
+      };
     }, [user])
   );
 
+  if (loading) {
+    return (
+      <View className="flex-1 bg-background items-center justify-center">
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+      </View>
+    );
+  }
+
   return (
     <View className="flex-1 bg-background">
+      <View className="px-5 pt-4 pb-1">
+        <TextInput
+          className="bg-surface-container-low rounded-lg p-4 font-body-md text-body-md text-on-surface"
+          placeholder="Search catalogs"
+          placeholderClassName="text-surface-dim"
+          value={search}
+          onChangeText={setSearch}
+        />
+      </View>
       <FlatList
-        data={[...lists, null]}
+        data={[...filteredLists, null]}
         keyExtractor={(item, index) => item?.id ?? `add-${index}`}
         numColumns={2}
         columnWrapperClassName="gap-4"
@@ -36,7 +76,7 @@ export function HomeScreen({ navigation }: Props) {
           item ? (
             <ListTile
               list={item}
-              itemCount={0}
+              itemCount={counts[item.id] ?? 0}
               onPress={() => navigation.navigate('ListDetail', { list: item })}
             />
           ) : (
