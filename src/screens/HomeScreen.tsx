@@ -1,8 +1,8 @@
-// src/screens/HomeScreen.tsx
 import { useCallback, useState } from 'react';
-import { FlatList, Pressable, Text, View, StyleSheet } from 'react-native';
+import { FlatList, Pressable, Text, View } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { MaterialIcons } from '@expo/vector-icons';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { CatalogList } from '../domain/types';
 import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository';
@@ -25,13 +25,13 @@ export function HomeScreen({ navigation }: Props) {
   );
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-background">
       <FlatList
         data={[...lists, null]}
         keyExtractor={(item, index) => item?.id ?? `add-${index}`}
         numColumns={2}
-        columnWrapperStyle={styles.row}
-        contentContainerStyle={styles.content}
+        columnWrapperClassName="gap-4"
+        contentContainerClassName="p-5 gap-4"
         renderItem={({ item }) =>
           item ? (
             <ListTile
@@ -41,10 +41,15 @@ export function HomeScreen({ navigation }: Props) {
             />
           ) : (
             <Pressable
-              style={styles.addTile}
+              className="flex-1 aspect-[4/5] rounded-lg border-2 border-dashed border-outline-variant items-center justify-center gap-3"
               onPress={() => navigation.navigate('EditListFields', {})}
             >
-              <Text style={styles.addIcon}>+</Text>
+              <View className="w-14 h-14 rounded-full bg-surface-container items-center justify-center">
+                <MaterialIcons name="add" size={26} color={theme.colors.outline} />
+              </View>
+              <Text className="font-label-md text-label-md text-secondary uppercase tracking-widest">
+                New Catalog
+              </Text>
             </Pressable>
           )
         }
@@ -52,20 +57,3 @@ export function HomeScreen({ navigation }: Props) {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background },
-  content: { padding: theme.spacing.lg, gap: theme.spacing.md },
-  row: { gap: theme.spacing.md },
-  addTile: {
-    flex: 1,
-    borderRadius: theme.radii.medium,
-    borderWidth: 1.5,
-    borderColor: theme.colors.border,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 90,
-  },
-  addIcon: { fontSize: 22, color: theme.colors.accent },
-});
