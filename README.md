@@ -6,16 +6,16 @@ Photos live in Supabase Storage rather than Firebase Storage because Firebase St
 
 ## Prerequisites
 
-- Node.js and [pnpm](https://pnpm.io/) (`packageManager` in `package.json` pins `pnpm@11.1.1`)
+- Node.js
 - [Expo Go](https://expo.dev/go) app on your phone, or an iOS/Android simulator
 - A [Firebase](https://console.firebase.google.com/) project
 - A [Supabase](https://supabase.com/dashboard) project (free tier)
-- The [Firebase CLI](https://firebase.google.com/docs/cli) for running the Firestore/Auth emulators and deploying Firestore rules: `pnpm dlx firebase-tools --version` (already available locally via the `firebase-tools` devDependency)
+- The [Firebase CLI](https://firebase.google.com/docs/cli) for running the Firestore/Auth emulators and deploying Firestore rules: `npx firebase-tools --version` (already available locally via the `firebase-tools` devDependency)
 
 ## Install
 
 ```bash
-pnpm install
+npm install
 ```
 
 ## Firebase project setup
@@ -24,7 +24,7 @@ pnpm install
 2. Enable **Authentication → Sign-in method → Google**.
 3. Enable **Firestore** (native mode).
 4. Register a Web app in the project settings to get the `firebaseConfig` values used below.
-5. Point the Firebase CLI at your project: `pnpm dlx firebase-tools use --add` and pick your project (this creates a local `.firebaserc`, which is gitignored per-project).
+5. Point the Firebase CLI at your project: `npx firebase-tools use --add` and pick your project (this creates a local `.firebaserc`, which is gitignored per-project).
 
 ### Google Sign-In
 
@@ -121,14 +121,14 @@ EXPO_PUBLIC_SUPABASE_ANON_KEY=
 Rules live in [firestore.rules](firestore.rules), scoping access to `users/{userId}/**` for the signed-in user only. Deploy them with:
 
 ```bash
-pnpm dlx firebase-tools deploy --only firestore:rules
+npx firebase-tools deploy --only firestore:rules
 ```
 
 (Photo storage access control is configured separately in Supabase — see the Supabase setup section above.)
 
 ## Development build
 
-Because of Google Sign-In (see above), this app needs a **development build** instead of plain Expo Go — Expo Go can't load `@react-native-google-signin/google-signin` since it requires custom native code. A dev build behaves like Expo Go day-to-day (same dev menu, same fast refresh against `pnpm start`); you only need to rebuild it when a native dependency or `app.json` native config changes, not for regular JS/TS edits.
+Because of Google Sign-In (see above), this app needs a **development build** instead of plain Expo Go — Expo Go can't load `@react-native-google-signin/google-signin` since it requires custom native code. A dev build behaves like Expo Go day-to-day (same dev menu, same fast refresh against `npm start`); you only need to rebuild it when a native dependency or `app.json` native config changes, not for regular JS/TS edits.
 
 Build one with either:
 
@@ -138,15 +138,15 @@ eas build --profile development --platform android   # cloud build, needs a free
 npx expo run:android                                  # local build, needs Android Studio installed
 ```
 
-Then install the resulting build on your device/emulator and run `pnpm start` as usual — it connects to the same Metro bundler.
+Then install the resulting build on your device/emulator and run `npm start` as usual — it connects to the same Metro bundler.
 
 ## Running the app
 
 ```bash
-pnpm start        # Expo dev server — open it in your development build (see above), not Expo Go
-pnpm android      # build and open on Android emulator/device
-pnpm ios          # build and open on iOS simulator/device
-pnpm web          # open in the browser
+npm start        # Expo dev server — open it in your development build (see above), not Expo Go
+npm run android  # build and open on Android emulator/device
+npm run ios      # build and open on iOS simulator/device
+npm run web      # open in the browser
 ```
 
 > This project targets Expo SDK 57. See [AGENTS.md](AGENTS.md) — the SDK changed significantly, so check the [versioned docs](https://docs.expo.dev/versions/v57.0.0/) before making changes.
@@ -154,12 +154,12 @@ pnpm web          # open in the browser
 ## Running tests
 
 ```bash
-pnpm test            # unit tests (mocked, no network)
-pnpm test:emulator   # tests against local Firestore + Auth emulators
+npm test                 # unit tests (mocked, no network)
+npm run test:emulator    # tests against local Firestore + Auth emulators
 ```
 
 `test:emulator` starts the Firestore and Auth emulators (ports `8080` and `9099`, configured in [firebase.json](firebase.json)) via the Firebase CLI and runs `src/services/FirebaseCatalogRepository.test.ts` against them — no real Firebase project or network access needed. If you want to run the emulators standalone (e.g. to poke around in the emulator UI):
 
 ```bash
-pnpm dlx firebase-tools emulators:start --only firestore,auth
+npx firebase-tools emulators:start --only firestore,auth
 ```
