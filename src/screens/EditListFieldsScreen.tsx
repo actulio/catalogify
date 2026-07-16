@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, FlatList, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, FlatList, Alert } from 'react-native';
+import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { FieldDef, FieldType } from '../domain/types';
@@ -10,6 +11,26 @@ import { theme } from '../theme/theme';
 type Props = NativeStackScreenProps<RootStackParamList, 'EditListFields'>;
 
 const FIELD_TYPES: FieldType[] = ['shortText', 'longText', 'number', 'rating', 'photo', 'boolean', 'date'];
+
+const FIELD_TYPE_ICONS: Record<FieldType, { name: string; family: 'material' | 'community' }> = {
+  shortText: { name: 'short-text', family: 'material' },
+  longText: { name: 'notes', family: 'material' },
+  number: { name: 'numeric', family: 'community' },
+  rating: { name: 'star', family: 'material' },
+  photo: { name: 'photo-camera', family: 'material' },
+  boolean: { name: 'toggle-on', family: 'material' },
+  date: { name: 'event', family: 'material' },
+};
+
+function FieldTypeIcon({ type, active }: { type: FieldType; active: boolean }) {
+  const { name, family } = FIELD_TYPE_ICONS[type];
+  const color = active ? '#ffffff' : theme.colors.onSurfaceVariant;
+  return family === 'material' ? (
+    <MaterialIcons name={name as any} size={18} color={color} />
+  ) : (
+    <MaterialCommunityIcons name={name as any} size={18} color={color} />
+  );
+}
 
 export function EditListFieldsScreen({ route, navigation }: Props) {
   const { user } = useAuth();
@@ -53,10 +74,11 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
   }
 
   return (
-    <View style={styles.container}>
+    <View className="flex-1 bg-background p-5">
       <TextInput
-        style={styles.nameInput}
+        className="bg-surface-container-low rounded-lg p-4 mb-4 font-body-md text-body-md text-on-surface"
         placeholder="List name (e.g. Coffees)"
+        placeholderClassName="text-surface-dim"
         value={name}
         onChangeText={setName}
         editable={!existing}
@@ -64,75 +86,55 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
       <FlatList
         data={fields}
         keyExtractor={(f) => f.key}
-        contentContainerStyle={styles.fieldList}
+        contentContainerClassName="gap-4 pb-6"
         renderItem={({ item, index }) => (
-          <View style={styles.fieldRow}>
+          <View className="bg-surface-container-low rounded-lg p-4 gap-3">
             <TextInput
-              style={styles.fieldLabelInput}
+              className="font-label-md text-label-md text-on-surface border-b border-outline-variant/40 pb-1"
               placeholder="Field label"
+              placeholderClassName="text-surface-dim"
               value={item.label}
               onChangeText={(label) => updateField(index, { label })}
             />
-            <View style={styles.typeRow}>
-              {FIELD_TYPES.map((type) => (
-                <Pressable
-                  key={type}
-                  style={[styles.typeChip, item.type === type && styles.typeChipActive]}
-                  onPress={() => updateField(index, { type })}
-                >
-                  <Text style={styles.typeChipText}>{type}</Text>
-                </Pressable>
-              ))}
+            <View className="flex-row flex-wrap gap-2">
+              {FIELD_TYPES.map((type) => {
+                const active = item.type === type;
+                return (
+                  <Pressable
+                    key={type}
+                    onPress={() => updateField(index, { type })}
+                    className={`flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant/40 ${
+                      active ? 'bg-primary' : 'bg-surface-container'
+                    }`}
+                  >
+                    <FieldTypeIcon type={type} active={active} />
+                    <Text
+                      className={`font-label-sm text-label-sm ${
+                        active ? 'text-white' : 'text-on-surface-variant'
+                      }`}
+                    >
+                      {type}
+                    </Text>
+                  </Pressable>
+                );
+              })}
             </View>
             <Pressable onPress={() => removeField(index)}>
-              <Text style={styles.removeText}>Remove field</Text>
+              <Text className="font-label-sm text-label-sm text-error">Remove field</Text>
             </Pressable>
           </View>
         )}
       />
-      <Pressable style={styles.addFieldButton} onPress={addField}>
-        <Text style={styles.addFieldText}>+ Add field</Text>
+      <Pressable className="py-4 items-center" onPress={addField}>
+        <Text className="font-label-md text-label-md text-primary">+ Add field</Text>
       </Pressable>
-      <Pressable style={styles.saveButton} onPress={save} disabled={saving}>
-        <Text style={styles.saveButtonText}>{saving ? 'Saving...' : 'Save'}</Text>
+      <Pressable
+        className={`bg-primary rounded-lg py-4 items-center ${saving ? 'opacity-60' : ''}`}
+        onPress={save}
+        disabled={saving}
+      >
+        <Text className="text-white text-base">{saving ? 'Saving...' : 'Save'}</Text>
       </Pressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: theme.colors.background, padding: theme.spacing.lg },
-  nameInput: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.radii.small,
-    padding: theme.spacing.md,
-    marginBottom: theme.spacing.md,
-  },
-  fieldList: { gap: theme.spacing.md },
-  fieldRow: {
-    backgroundColor: theme.colors.cardBackground,
-    borderRadius: theme.radii.small,
-    padding: theme.spacing.md,
-    gap: theme.spacing.sm,
-  },
-  fieldLabelInput: { fontSize: 15, color: theme.colors.textPrimary },
-  typeRow: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.xs },
-  typeChip: {
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 999,
-    backgroundColor: theme.colors.background,
-  },
-  typeChipActive: { backgroundColor: theme.colors.accent },
-  typeChipText: { fontSize: 11, color: theme.colors.textPrimary },
-  removeText: { fontSize: 12, color: theme.colors.danger },
-  addFieldButton: { paddingVertical: theme.spacing.md, alignItems: 'center' },
-  addFieldText: { color: theme.colors.accentStrong },
-  saveButton: {
-    backgroundColor: theme.colors.accentStrong,
-    borderRadius: theme.radii.medium,
-    paddingVertical: theme.spacing.md,
-    alignItems: 'center',
-  },
-  saveButtonText: { color: '#FFFFFF', fontSize: 16 },
-});
