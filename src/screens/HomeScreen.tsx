@@ -12,6 +12,10 @@ import { theme } from '../theme/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
 
+type GridCell =
+  | { kind: 'list'; key: string; list: CatalogList }
+  | { kind: 'add'; key: string };
+
 export function HomeScreen({ navigation }: Props) {
   const { user } = useAuth();
   const [lists, setLists] = useState<CatalogList[]>([]);
@@ -24,6 +28,13 @@ export function HomeScreen({ navigation }: Props) {
     if (!needle) return lists;
     return lists.filter((l) => l.name.toLowerCase().includes(needle));
   }, [lists, search]);
+
+  // The 2-column grid is the catalog tiles plus a trailing "New Catalog" tile.
+  const gridCells = useMemo<GridCell[]>(() => {
+    const cells: GridCell[] = filteredLists.map((list) => ({ kind: 'list', key: list.id, list }));
+    cells.push({ kind: 'add', key: '__add__' });
+    return cells;
+  }, [filteredLists]);
 
   useFocusEffect(
     useCallback(() => {
@@ -67,21 +78,24 @@ export function HomeScreen({ navigation }: Props) {
         />
       </View>
       <FlatList
-        data={[...filteredLists, null]}
-        keyExtractor={(item, index) => item?.id ?? `add-${index}`}
+        data={gridCells}
+        keyExtractor={(cell) => cell.key}
         numColumns={2}
-        columnWrapperClassName="gap-4"
+        columnWrapperClassName="justify-between"
         contentContainerClassName="p-5 gap-4"
-        renderItem={({ item }) =>
-          item ? (
-            <ListTile
-              list={item}
-              itemCount={counts[item.id] ?? 0}
-              onPress={() => navigation.navigate('ListDetail', { list: item })}
-            />
-          ) : (
+        renderItem={({ item: cell }) => {
+          if (cell.kind === 'list') {
+            return (
+              <ListTile
+                list={cell.list}
+                itemCount={counts[cell.list.id] ?? 0}
+                onPress={() => navigation.navigate('ListDetail', { list: cell.list })}
+              />
+            );
+          }
+          return (
             <Pressable
-              className="flex-1 aspect-[4/5] rounded-lg border-2 border-dashed border-outline-variant items-center justify-center gap-3"
+              className="w-[48%] aspect-[4/5] rounded-lg border-2 border-dashed border-outline-variant items-center justify-center gap-3"
               onPress={() => navigation.navigate('EditListFields', {})}
             >
               <View className="w-14 h-14 rounded-full bg-surface-container items-center justify-center">
@@ -91,8 +105,8 @@ export function HomeScreen({ navigation }: Props) {
                 New Catalog
               </Text>
             </Pressable>
-          )
-        }
+          );
+        }}
       />
     </View>
   );
