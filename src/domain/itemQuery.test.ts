@@ -13,9 +13,9 @@ function item(partial: Partial<CatalogItem> & { id: string }): CatalogItem {
 }
 
 const items: CatalogItem[] = [
-  item({ id: 'a', title: 'Ethiopia Yirgacheffe', values: { rating: 9, price: 40, decaf: false }, createdAt: 300 }),
-  item({ id: 'b', title: 'Brazil Santos', values: { rating: 6, price: 25, decaf: true }, createdAt: 200 }),
-  item({ id: 'c', title: 'Colombia Huila', values: { rating: 8, price: 32, decaf: false }, createdAt: 100 }),
+  item({ id: 'a', title: 'Ethiopia Yirgacheffe', values: { rating: 9, price: 40, decaf: false, opened: 1000 }, createdAt: 300 }),
+  item({ id: 'b', title: 'Brazil Santos', values: { rating: 6, price: 25, decaf: true, opened: 2000 }, createdAt: 200 }),
+  item({ id: 'c', title: 'Colombia Huila', values: { rating: 8, price: 32, decaf: false, opened: 3000 }, createdAt: 100 }),
 ];
 
 describe('applyQuery — search', () => {
@@ -53,9 +53,28 @@ describe('applyQuery — filters', () => {
     expect(applyQuery(items, { filters }).map((i) => i.id).sort()).toEqual(['a', 'c']);
   });
 
-  it('dateRange filters on createdAt inclusive', () => {
-    const filters: Filters = { __date: { kind: 'dateRange', from: 150, to: 250 } };
+  it('dateRange filters a date field value inclusive', () => {
+    const filters: Filters = { opened: { kind: 'dateRange', from: 1500, to: 2500 } };
     expect(applyQuery(items, { filters }).map((i) => i.id)).toEqual(['b']);
+  });
+
+  it('dateRange excludes items missing the date value', () => {
+    const noDate = item({ id: 'd', title: 'No date', values: { rating: 5 } });
+    const filters: Filters = { opened: { kind: 'dateRange', from: 0, to: 9999 } };
+    expect(applyQuery([...items, noDate], { filters }).map((i) => i.id).sort()).toEqual(['a', 'b', 'c']);
+  });
+
+  it('range filter excludes items with a missing/non-numeric value', () => {
+    const noPrice = item({ id: 'd', title: 'No price', values: { rating: 5 } });
+    const filters: Filters = { price: { kind: 'range', min: 0 } };
+    expect(applyQuery([...items, noPrice], { filters }).map((i) => i.id).sort()).toEqual(['a', 'b', 'c']);
+  });
+
+  it('boolean filter excludes items missing the field', () => {
+    const noDecaf = item({ id: 'd', title: 'No decaf', values: { rating: 5 } });
+    const filters: Filters = { decaf: { kind: 'boolean', value: false } };
+    // a and c have decaf:false; d has no decaf value and must NOT match value:false
+    expect(applyQuery([...items, noDecaf], { filters }).map((i) => i.id).sort()).toEqual(['a', 'c']);
   });
 });
 
@@ -117,5 +136,12 @@ describe('computeStats', () => {
   it('returns null averages for an empty set', () => {
     const rating = computeStats([], fields).fields.find((f) => f.key === 'rating');
     expect(rating).toMatchObject({ average: null });
+  });
+
+  it('boolean stats ignore items missing the field', () => {
+    const noDecaf = item({ id: 'd', title: 'No decaf', values: { rating: 5 } });
+    const decaf = computeStats([...items, noDecaf], fields).fields.find((f) => f.key === 'decaf');
+    // 3 items have decaf set (1 true, 2 false); the 4th (missing) is ignored
+    expect(decaf).toMatchObject({ type: 'boolean', yes: 1, no: 2 });
   });
 });

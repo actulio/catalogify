@@ -16,11 +16,9 @@ export interface DateRangeFilter {
 }
 export type Filter = RangeFilter | BooleanFilter | DateRangeFilter;
 
-// Keyed by field.key. A dateRange filter (there is at most one per catalog) uses
-// the reserved key "__date" and matches against item.createdAt.
+// Keyed by field.key. A dateRange filter is keyed by a date field's key and matches
+// that field's ms-epoch value.
 export type Filters = Record<string, Filter>;
-
-export const DATE_FILTER_KEY = '__date';
 
 export type SortField =
   | { kind: 'dateAdded' }
@@ -30,6 +28,8 @@ export interface SortSpec {
   field: SortField;
   direction: 'asc' | 'desc';
 }
+
+export const DEFAULT_SORT: SortSpec = { field: { kind: 'dateAdded' }, direction: 'desc' };
 
 export interface ItemQuerySpec {
   searchText?: string;
@@ -46,7 +46,8 @@ function matchesSearch(item: CatalogItem, needle: string): boolean {
 
 function matchesFilter(item: CatalogItem, key: string, filter: Filter): boolean {
   if (filter.kind === 'dateRange') {
-    const t = item.createdAt;
+    const t = Number(item.values[key] ?? NaN);
+    if (Number.isNaN(t)) return false;
     if (filter.from !== undefined && t < filter.from) return false;
     if (filter.to !== undefined && t > filter.to) return false;
     return true;
@@ -60,7 +61,8 @@ function matchesFilter(item: CatalogItem, key: string, filter: Filter): boolean 
     return true;
   }
   // boolean
-  return Boolean(value) === filter.value;
+  if (typeof value !== 'boolean') return false;
+  return value === filter.value;
 }
 
 export function applyQuery(items: CatalogItem[], spec: ItemQuerySpec): CatalogItem[] {
@@ -102,7 +104,6 @@ export interface RatingStat {
   type: 'rating';
   count: number;
   average: number | null;
-  distribution: Record<number, number>;
 }
 export interface NumberStat {
   key: string;
@@ -143,12 +144,7 @@ export function computeStats(items: CatalogItem[], fields: FieldDef[]): CatalogS
       const count = nums.length;
       const average = count ? nums.reduce((s, n) => s + n, 0) / count : null;
       if (field.type === 'rating') {
-        const distribution: Record<number, number> = {};
-        for (const n of nums) {
-          const bucket = Math.round(n);
-          distribution[bucket] = (distribution[bucket] ?? 0) + 1;
-        }
-        stats.push({ key: field.key, label: field.label, type: 'rating', count, average, distribution });
+        stats.push({ key: field.key, label: field.label, type: 'rating', count, average });
       } else {
         stats.push({
           key: field.key,
@@ -164,8 +160,10 @@ export function computeStats(items: CatalogItem[], fields: FieldDef[]): CatalogS
       let yes = 0;
       let no = 0;
       for (const i of items) {
-        if (i.values[field.key] === true) yes += 1;
-        else no += 1;
+        const v = i.values[field.key];
+        if (v === true) yes += 1;
+        else if (v === false) no += 1;
+        // missing/other → ignored, mirroring numeric stats
       }
       stats.push({ key: field.key, label: field.label, type: 'boolean', yes, no });
     }
