@@ -3,6 +3,7 @@ import {
   KEEPALIVE_REMINDER_SECONDS,
   ensureNotificationPermission,
   rescheduleKeepAliveReminder,
+  setupNotifications,
 } from './reminders';
 
 jest.mock('expo-notifications', () => ({
@@ -63,5 +64,33 @@ describe('rescheduleKeepAliveReminder', () => {
 
     expect(Notifications.cancelAllScheduledNotificationsAsync).not.toHaveBeenCalled();
     expect(Notifications.scheduleNotificationAsync).not.toHaveBeenCalled();
+  });
+
+  it('resolves (does not reject) and logs a warning when scheduling rejects', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    Notifications.getPermissionsAsync.mockResolvedValue({ granted: true });
+    Notifications.scheduleNotificationAsync.mockRejectedValue(new Error('boom'));
+
+    await expect(rescheduleKeepAliveReminder()).resolves.toBeUndefined();
+
+    expect(warnSpy).toHaveBeenCalledWith(
+      'Failed to (re)schedule keep-alive reminder',
+      expect.any(Error)
+    );
+    warnSpy.mockRestore();
+  });
+});
+
+describe('setupNotifications', () => {
+  it('resolves (does not reject) and logs a warning when an underlying call rejects', async () => {
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+    Notifications.setNotificationHandler.mockImplementation(() => {
+      throw new Error('boom');
+    });
+
+    await expect(setupNotifications()).resolves.toBeUndefined();
+
+    expect(warnSpy).toHaveBeenCalledWith('Failed to set up notifications', expect.any(Error));
+    warnSpy.mockRestore();
   });
 });

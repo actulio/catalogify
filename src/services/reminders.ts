@@ -6,24 +6,30 @@ import { Platform } from 'react-native';
 // free-tier pause. Reset on every app open, so it only fires after real idleness.
 export const KEEPALIVE_REMINDER_SECONDS = 5 * 24 * 60 * 60; // 432000
 
+// setupNotifications() must run before rescheduleKeepAliveReminder() on Android
+// so the notification channel exists before a notification targets it.
 const CHANNEL_ID = 'keepalive';
 const REMINDER_TITLE = 'Catalogify';
 const REMINDER_BODY = 'Open Catalogify to keep your catalog awake.';
 
 export async function setupNotifications(): Promise<void> {
-  Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-      shouldShowBanner: true,
-      shouldShowList: true,
-      shouldPlaySound: false,
-      shouldSetBadge: false,
-    }),
-  });
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-      name: 'Keep-alive reminders',
-      importance: Notifications.AndroidImportance.DEFAULT,
+  try {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowBanner: true,
+        shouldShowList: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+      }),
     });
+    if (Platform.OS === 'android') {
+      await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
+        name: 'Keep-alive reminders',
+        importance: Notifications.AndroidImportance.DEFAULT,
+      });
+    }
+  } catch (err) {
+    console.warn('Failed to set up notifications', err);
   }
 }
 
@@ -35,16 +41,20 @@ export async function ensureNotificationPermission(): Promise<boolean> {
 }
 
 export async function rescheduleKeepAliveReminder(): Promise<void> {
-  const granted = await ensureNotificationPermission();
-  if (!granted) return;
-  await Notifications.cancelAllScheduledNotificationsAsync();
-  await Notifications.scheduleNotificationAsync({
-    content: { title: REMINDER_TITLE, body: REMINDER_BODY },
-    trigger: {
-      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-      seconds: KEEPALIVE_REMINDER_SECONDS,
-      repeats: true,
-      channelId: CHANNEL_ID,
-    },
-  });
+  try {
+    const granted = await ensureNotificationPermission();
+    if (!granted) return;
+    await Notifications.cancelAllScheduledNotificationsAsync();
+    await Notifications.scheduleNotificationAsync({
+      content: { title: REMINDER_TITLE, body: REMINDER_BODY },
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: KEEPALIVE_REMINDER_SECONDS,
+        repeats: true,
+        channelId: CHANNEL_ID,
+      },
+    });
+  } catch (err) {
+    console.warn('Failed to (re)schedule keep-alive reminder', err);
+  }
 }
