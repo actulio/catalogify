@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, FlatList, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, FlatList, Image, Alert } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
@@ -53,6 +54,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
   const existing = route.params?.list;
   const [name, setName] = useState(existing?.name ?? '');
   const [fields, setFields] = useState<FieldDef[]>(existing?.fields ?? [makeRatingField()]);
+  const [coverUri, setCoverUri] = useState<string | undefined>(existing?.coverUrl);
   const [saving, setSaving] = useState(false);
 
   function addField() {
@@ -78,15 +80,26 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
     setFields((prev) => prev.filter((f, i) => !(i === index && !isLockedRating(f))));
   }
 
+  async function pickCover() {
+    const result = await ImagePicker.launchImageLibraryAsync({ quality: 1 });
+    if (!result.canceled) setCoverUri(result.assets[0].uri);
+  }
+
   async function save() {
     if (!user || !name.trim()) return;
     setSaving(true);
     try {
       const repo = new FirebaseCatalogRepository(user.uid);
+      // Only upload when the cover is a freshly picked local file — an existing
+      // https:// signed URL means it's unchanged.
+      const coverChanged =
+        !!coverUri && coverUri !== existing?.coverUrl && !coverUri.startsWith('https://');
+      const coverToUpload = coverChanged ? coverUri : undefined;
       if (existing) {
         await repo.updateListFields(existing.id, fields);
+        if (coverToUpload) await repo.updateListCover(existing.id, coverToUpload);
       } else {
-        await repo.createList(name.trim(), fields);
+        await repo.createList(name.trim(), fields, coverToUpload);
       }
       navigation.goBack();
     } catch (error) {
@@ -120,6 +133,29 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
               />
               <Text className="font-body-md text-body-md text-on-surface-variant">
                 Give your catalog a name. This is what you'll see on the home screen.
+              </Text>
+            </View>
+            <View className="gap-2">
+              <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
+                Cover Image
+              </Text>
+              <Pressable onPress={pickCover}>
+                {coverUri ? (
+                  <Image
+                    source={{ uri: coverUri }}
+                    className="w-32 aspect-[4/5] rounded-lg"
+                    resizeMode="cover"
+                  />
+                ) : (
+                  <View className="w-32 aspect-[4/5] rounded-lg border-2 border-dashed border-surface-dim bg-surface-container-low items-center justify-center px-2">
+                    <Text className="font-label-md text-label-md text-on-surface-variant text-center">
+                      Tap to add cover
+                    </Text>
+                  </View>
+                )}
+              </Pressable>
+              <Text className="font-body-md text-body-md text-on-surface-variant">
+                Optional. Shown behind the catalog name on the home screen.
               </Text>
             </View>
             <View className="gap-1">
