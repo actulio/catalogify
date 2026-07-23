@@ -1,4 +1,24 @@
+import { useEffect, useState } from 'react';
+import { Keyboard } from 'react-native';
 import { useAnimatedKeyboard, useAnimatedStyle } from 'react-native-reanimated';
+
+/**
+ * True while the on-screen keyboard is visible. Used to render the keyboard
+ * spacer only when needed, so its container's flex `gap` doesn't leave a
+ * constant empty gap at the bottom while the keyboard is closed.
+ */
+export function useKeyboardVisible() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const show = Keyboard.addListener('keyboardDidShow', () => setVisible(true));
+    const hide = Keyboard.addListener('keyboardDidHide', () => setVisible(false));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
+  }, []);
+  return visible;
+}
 
 /**
  * Returns an animated style whose `height` tracks the on-screen keyboard height.

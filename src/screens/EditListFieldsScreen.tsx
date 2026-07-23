@@ -14,7 +14,7 @@ import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository
 import { useAuth } from '../services/auth';
 import { theme } from '../theme/theme';
 import { PressableScale } from '../components/PressableScale';
-import { useKeyboardSpacerStyle } from '../hooks/useKeyboardSpacer';
+import { useKeyboardSpacerStyle, useKeyboardVisible } from '../hooks/useKeyboardSpacer';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditListFields'>;
 
@@ -65,6 +65,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
   const [saving, setSaving] = useState(false);
   const listRef = useRef<RNFlatList<FieldDef>>(null);
   const keyboardSpacer = useKeyboardSpacerStyle();
+  const keyboardVisible = useKeyboardVisible();
 
   function addField() {
     setFields((prev) => [
@@ -131,7 +132,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
         keyboardShouldPersistTaps="handled"
         itemLayoutAnimation={LinearTransition.duration(220)}
         showsVerticalScrollIndicator={false}
-        ListFooterComponent={<Animated.View style={keyboardSpacer} />}
+        ListFooterComponent={keyboardVisible ? <Animated.View style={keyboardSpacer} /> : null}
         ListHeaderComponent={
           <View className="gap-6 mb-4">
             <View className="gap-2">

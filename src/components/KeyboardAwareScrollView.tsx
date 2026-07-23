@@ -7,7 +7,7 @@ import {
   TextInput,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useKeyboardSpacerStyle } from '../hooks/useKeyboardSpacer';
+import { useKeyboardSpacerStyle, useKeyboardVisible } from '../hooks/useKeyboardSpacer';
 
 type Props = ScrollViewProps & { children: React.ReactNode };
 
@@ -23,6 +23,7 @@ type Props = ScrollViewProps & { children: React.ReactNode };
 export const KeyboardAwareScrollView = forwardRef<ScrollView, Props>(
   function KeyboardAwareScrollView({ children, ...rest }, ref) {
     const spacerStyle = useKeyboardSpacerStyle();
+    const keyboardVisible = useKeyboardVisible();
     const scrollRef = useRef<ScrollView | null>(null);
 
     useEffect(() => {
@@ -49,7 +50,7 @@ export const KeyboardAwareScrollView = forwardRef<ScrollView, Props>(
         {...rest}
       >
         {children}
-        <Animated.View style={spacerStyle} />
+        {keyboardVisible && <Animated.View style={spacerStyle} />}
       </ScrollView>
     );
   }
