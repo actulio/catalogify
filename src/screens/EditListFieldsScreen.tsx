@@ -1,5 +1,10 @@
-import { useState } from 'react';
-import { View, Text, TextInput, Pressable, FlatList, Image, Alert, Switch } from 'react-native';
+import { useState, useRef } from 'react';
+import { View, Text, TextInput, Pressable, FlatList as RNFlatList, Image, Alert, Switch } from 'react-native';
+import Animated, {
+  FadeInDown,
+  SlideOutLeft,
+  LinearTransition,
+} from 'react-native-reanimated';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -9,6 +14,7 @@ import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository
 import { useAuth } from '../services/auth';
 import { theme } from '../theme/theme';
 import { PressableScale } from '../components/PressableScale';
+import { useKeyboardPadding } from '../hooks/useKeyboardPadding';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditListFields'>;
 
@@ -57,12 +63,16 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
   const [fields, setFields] = useState<FieldDef[]>(existing?.fields ?? [makeRatingField()]);
   const [coverUri, setCoverUri] = useState<string | undefined>(existing?.coverUrl);
   const [saving, setSaving] = useState(false);
+  const listRef = useRef<RNFlatList<FieldDef>>(null);
+  const keyboardPad = useKeyboardPadding();
 
   function addField() {
     setFields((prev) => [
       ...prev,
       { key: `field_${prev.length}_${Date.now()}`, label: '', type: 'shortText', required: false },
     ]);
+    // Reveal the freshly appended card once it has laid out.
+    requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
   }
 
   function updateField(index: number, patch: Partial<FieldDef>) {
@@ -113,10 +123,14 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
 
   return (
     <View className="flex-1 bg-background p-5">
-      <FlatList
+      <Animated.FlatList
+        ref={listRef}
         data={fields}
         keyExtractor={(f) => f.key}
         contentContainerClassName="gap-4 pb-6"
+        contentContainerStyle={keyboardPad as any}
+        keyboardShouldPersistTaps="handled"
+        itemLayoutAnimation={LinearTransition.duration(220)}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <View className="gap-6 mb-4">
@@ -172,7 +186,11 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
         renderItem={({ item, index }) => {
           const locked = isLockedRating(item);
           return (
-            <View className="bg-surface-container-low rounded-lg p-4 gap-3">
+            <Animated.View
+              entering={FadeInDown.duration(250)}
+              exiting={SlideOutLeft.duration(200)}
+              className="bg-surface-container-low rounded-lg p-4 gap-3"
+            >
               <TextInput
                 className="font-label-md text-label-md text-on-surface border-b border-outline-variant/40 pb-1"
                 placeholder="Field label"
@@ -232,7 +250,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
                   <Text className="font-label-sm text-label-sm text-error">Remove field</Text>
                 </PressableScale>
               )}
-            </View>
+            </Animated.View>
           );
         }}
       />
