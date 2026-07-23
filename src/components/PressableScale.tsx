@@ -20,13 +20,13 @@ type Props = PressableProps & {
  * props (onPress, disabled, className via NativeWind, etc.).
  */
 export const PressableScale = forwardRef<View, Props>(function PressableScale(
-  { activeScale = 0.96, onPressIn, onPressOut, disabled, ...rest },
+  { activeScale = 0.96, onPressIn, onPressOut, disabled, style: styleProp, ...rest },
   ref
 ) {
   const scale = useSharedValue(1);
   const opacity = useSharedValue(1);
 
-  const style = useAnimatedStyle(() => ({
+  const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
     opacity: opacity.value,
   }));
@@ -45,8 +45,8 @@ export const PressableScale = forwardRef<View, Props>(function PressableScale(
         opacity.value = withTiming(1, { duration: 120 });
         onPressOut?.(e);
       }}
-      style={style}
       {...rest}
+      style={[styleProp, animatedStyle]}
     />
   );
 });
