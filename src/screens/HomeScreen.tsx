@@ -5,7 +5,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { CatalogList } from '../domain/types';
 import { useLists, useItemCounts } from '../hooks/useCatalogQueries';
-import { useAuth } from '../services/auth';
 import { ListTile } from '../components/ListTile';
 import { theme } from '../theme/theme';
 
@@ -16,7 +15,6 @@ type GridCell =
   | { kind: 'add'; key: string };
 
 export function HomeScreen({ navigation }: Props) {
-  const { user } = useAuth();
   const { data: lists = [], isLoading } = useLists();
   const { data: counts = {} } = useItemCounts(lists.map((l) => l.id));
   const [search, setSearch] = useState('');

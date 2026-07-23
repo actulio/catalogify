@@ -38,11 +38,6 @@ export default function App() {
 
   if (error) {
     console.error('Font loading failed', error);
-    return (
-      <QueryClientProvider client={queryClient}>
-        <RootNavigator />
-      </QueryClientProvider>
-    );
   }
 
   if (!loaded) return null;
