@@ -58,8 +58,10 @@ export class FirebaseCatalogRepository implements CatalogRepository {
 
   async deleteList(listId: string): Promise<void> {
     const items = await getDocs(itemsCol(this.uid, listId));
+    const photoPaths = items.docs.map((d) => this.photoPath(listId, d.id));
     await Promise.all(items.docs.map((d) => deleteDoc(d.ref)));
     await deleteDoc(doc(listsCol(this.uid), listId));
+    await this.removePhotos(photoPaths);
   }
 
   async getItemCounts(listIds: string[]): Promise<Record<string, number>> {
@@ -154,12 +156,26 @@ export class FirebaseCatalogRepository implements CatalogRepository {
 
   async deleteItem(listId: string, itemId: string): Promise<void> {
     await deleteDoc(doc(itemsCol(this.uid, listId), itemId));
+    await this.removePhotos([this.photoPath(listId, itemId)]);
+  }
+
+  private photoPath(listId: string, itemId: string): string {
+    return `${this.uid}/lists/${listId}/items/${itemId}/photo.jpg`;
+  }
+
+  // Best-effort storage cleanup: the Firestore delete is the source of truth, so a
+  // storage failure is logged but never surfaced as a failed delete. Supabase's
+  // remove() silently ignores paths that don't exist, so photo-less items are safe.
+  private async removePhotos(paths: string[]): Promise<void> {
+    if (paths.length === 0) return;
+    const { error } = await supabase.storage.from(PHOTOS_BUCKET).remove(paths);
+    if (error) console.warn('Failed to remove item photo(s) from storage', error);
   }
 
   private async uploadPhoto(listId: string, itemId: string, photoUri: string): Promise<string> {
     const info = await ImageManipulator.manipulateAsync(photoUri, []);
     const { data: photoData } = await resizeUnderSizeLimit(photoUri, info.width, info.height);
-    const path = `${this.uid}/lists/${listId}/items/${itemId}/photo.jpg`;
+    const path = this.photoPath(listId, itemId);
 
     const { error: uploadError } = await supabase.storage
       .from(PHOTOS_BUCKET)

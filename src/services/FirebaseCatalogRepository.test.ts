@@ -1,5 +1,6 @@
 import { signInAnonymously } from 'firebase/auth';
 import { auth, connectToEmulators } from './firebase';
+import { supabase, PHOTOS_BUCKET } from './supabase';
 import { FirebaseCatalogRepository } from './FirebaseCatalogRepository';
 
 beforeAll(() => {
@@ -7,11 +8,26 @@ beforeAll(() => {
 });
 
 let repo: FirebaseCatalogRepository;
+let uid: string;
 
 beforeEach(async () => {
   const { user } = await signInAnonymously(auth);
+  uid = user.uid;
   repo = new FirebaseCatalogRepository(user.uid);
 });
+
+// Restore after the test body has run its assertions — restoring inside the test
+// (e.g. a finally) would wipe the spy's recorded calls before we can assert on them.
+afterEach(() => {
+  jest.restoreAllMocks();
+});
+
+/** Spy that captures every `supabase.storage.from(...).remove(paths)` call. */
+function spyOnStorageRemove() {
+  const remove = jest.fn().mockResolvedValue({ data: [], error: null });
+  const fromSpy = jest.spyOn(supabase.storage, 'from').mockReturnValue({ remove } as never);
+  return { remove, fromSpy };
+}
 
 describe('FirebaseCatalogRepository', () => {
   it('creates and lists catalogs', async () => {
@@ -75,5 +91,35 @@ describe('FirebaseCatalogRepository', () => {
 
     const lists = await repo.getLists();
     expect(lists.map((l) => l.id)).not.toContain(list.id);
+  });
+
+  it('removes the item photo from storage when an item is deleted', async () => {
+    const list = await repo.createList('Coffees', []);
+    const item = await repo.addItem(list.id, 'With Photo', {});
+
+    const { remove, fromSpy } = spyOnStorageRemove();
+    await repo.deleteItem(list.id, item.id);
+
+    expect(fromSpy).toHaveBeenCalledWith(PHOTOS_BUCKET);
+    expect(remove).toHaveBeenCalledWith([`${uid}/lists/${list.id}/items/${item.id}/photo.jpg`]);
+  });
+
+  it('removes every item photo from storage when a list is deleted', async () => {
+    const list = await repo.createList('Coffees', []);
+    const a = await repo.addItem(list.id, 'A', {});
+    const b = await repo.addItem(list.id, 'B', {});
+
+    const { remove } = spyOnStorageRemove();
+    await repo.deleteList(list.id);
+
+    expect(remove).toHaveBeenCalledTimes(1);
+    const paths = remove.mock.calls[0][0] as string[];
+    expect(paths).toEqual(
+      expect.arrayContaining([
+        `${uid}/lists/${list.id}/items/${a.id}/photo.jpg`,
+        `${uid}/lists/${list.id}/items/${b.id}/photo.jpg`,
+      ])
+    );
+    expect(paths).toHaveLength(2);
   });
 });
