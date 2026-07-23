@@ -8,8 +8,9 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { MaterialIcons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { CatalogList } from '../domain/types';
-import { Filters, SortField, SortSpec, DATE_FILTER_KEY } from '../domain/itemQuery';
+import { Filters, SortField, SortSpec, DEFAULT_SORT } from '../domain/itemQuery';
 import { theme } from '../theme/theme';
 
 interface Props {
@@ -52,6 +53,7 @@ export function FilterSortSheet({
   onFiltersChange,
 }: Props) {
   const [rendered, setRendered] = useState(visible);
+  const [datePickerFor, setDatePickerFor] = useState<{ key: string; bound: 'from' | 'to' } | null>(null);
   const progress = useSharedValue(0);
   const sheetHeight = useSharedValue(700);
 
@@ -82,6 +84,7 @@ export function FilterSortSheet({
 
   const boolFields = list.fields.filter((f) => f.type === 'boolean');
   const rangeFields = list.fields.filter((f) => f.type === 'rating' || f.type === 'number');
+  const dateFields = list.fields.filter((f) => f.type === 'date');
 
   return (
     <Modal transparent visible animationType="none" onRequestClose={onClose}>
@@ -124,7 +127,7 @@ export function FilterSortSheet({
             })}
           </View>
 
-          {(rangeFields.length > 0 || boolFields.length > 0) && (
+          {(rangeFields.length > 0 || boolFields.length > 0 || dateFields.length > 0) && (
             <Text className="font-headline-sm text-headline-sm text-on-surface mb-3">Filters</Text>
           )}
 
@@ -195,8 +198,66 @@ export function FilterSortSheet({
             );
           })}
 
-          <Pressable onPress={() => onFiltersChange({})} className="mt-2 mb-1 py-3 items-center">
-            <Text className="font-label-md text-label-md text-primary">Clear all filters</Text>
+          {dateFields.map((f) => {
+            const current = filters[f.key];
+            const range = current?.kind === 'dateRange' ? current : undefined;
+            const label = (ms?: number) =>
+              ms === undefined ? 'Any' : new Date(ms).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+            function setBound(bound: 'from' | 'to', ms: number | undefined) {
+              const next = { ...(range ?? { kind: 'dateRange' as const }) };
+              if (ms === undefined) delete next[bound];
+              else next[bound] = ms;
+              // if both bounds cleared, drop the filter entirely
+              if (next.from === undefined && next.to === undefined) setFilter(f.key, undefined);
+              else setFilter(f.key, next);
+            }
+            return (
+              <View key={f.key} className="mb-4">
+                <Text className="font-label-md text-label-md text-on-surface-variant mb-2">{f.label}</Text>
+                <View className="flex-row gap-2">
+                  {(['from', 'to'] as const).map((bound) => (
+                    <Pressable
+                      key={bound}
+                      onPress={() => setDatePickerFor({ key: f.key, bound })}
+                      className={`flex-1 px-3 py-2 rounded-lg border ${
+                        range?.[bound] !== undefined ? 'border-primary' : 'border-outline-variant/40'
+                      }`}
+                    >
+                      <Text className="font-label-sm text-label-sm text-on-surface-variant">
+                        {bound === 'from' ? 'From' : 'To'}
+                      </Text>
+                      <Text className="font-body-md text-body-md text-on-surface">{label(range?.[bound])}</Text>
+                    </Pressable>
+                  ))}
+                  {range && (
+                    <Pressable onPress={() => setFilter(f.key, undefined)} className="px-3 py-2 justify-center">
+                      <Text className="font-label-md text-label-md text-primary">Clear</Text>
+                    </Pressable>
+                  )}
+                </View>
+                {datePickerFor?.key === f.key && (
+                  <DateTimePicker
+                    value={range?.[datePickerFor.bound] !== undefined ? new Date(range[datePickerFor.bound]!) : new Date()}
+                    mode="date"
+                    onChange={(event, selected) => {
+                      const bound = datePickerFor.bound;
+                      setDatePickerFor(null);
+                      if (event.type === 'set' && selected) setBound(bound, selected.getTime());
+                    }}
+                  />
+                )}
+              </View>
+            );
+          })}
+
+          <Pressable
+            onPress={() => {
+              onFiltersChange({});
+              onSortChange(DEFAULT_SORT);
+            }}
+            className="mt-2 mb-1 py-3 items-center"
+          >
+            <Text className="font-label-md text-label-md text-primary">Clear all</Text>
           </Pressable>
         </ScrollView>
       </Animated.View>

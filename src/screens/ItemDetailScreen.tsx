@@ -17,6 +17,7 @@ function isEmpty(v: unknown): boolean {
 }
 
 function formatDate(ms: number): string {
+  if (!Number.isFinite(ms)) return '—';
   return new Date(ms).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 }
 

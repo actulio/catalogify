@@ -27,7 +27,8 @@
     },
     "plugins": [
       "@react-native-google-signin/google-signin",
-      "expo-font"
+      "expo-font",
+      "@react-native-community/datetimepicker"
     ]
   }
 }

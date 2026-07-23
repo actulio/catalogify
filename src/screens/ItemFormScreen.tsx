@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { ScrollView, View, Text, TextInput, Pressable, Image, Switch, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { FieldValue } from '../domain/types';
@@ -21,6 +22,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
   const [photoUri, setPhotoUri] = useState<string | undefined>(item?.photoUrl);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [saving, setSaving] = useState(false);
+  const [datePickerFor, setDatePickerFor] = useState<string | null>(null);
 
   function setValue(key: string, value: FieldValue) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -119,7 +121,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
               {field.label}
             </Text>
 
-            {(field.type === 'shortText' || field.type === 'number' || field.type === 'date') && (
+            {(field.type === 'shortText' || field.type === 'number') && (
               <TextInput
                 className="bg-surface-container-low border border-surface-dim rounded-lg p-4 font-body-md text-body-md text-on-surface"
                 placeholderClassName="text-surface-dim"
@@ -129,6 +131,35 @@ export function ItemFormScreen({ route, navigation }: Props) {
                 }
                 keyboardType={field.type === 'number' ? 'numeric' : 'default'}
               />
+            )}
+
+            {field.type === 'date' && (
+              <>
+                <Pressable
+                  onPress={() => setDatePickerFor(field.key)}
+                  className="bg-surface-container-low border border-surface-dim rounded-lg p-4"
+                >
+                  <Text className="font-body-md text-body-md text-on-surface">
+                    {values[field.key] != null
+                      ? new Date(Number(values[field.key])).toLocaleDateString(undefined, {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })
+                      : 'Tap to pick a date'}
+                  </Text>
+                </Pressable>
+                {datePickerFor === field.key && (
+                  <DateTimePicker
+                    value={values[field.key] != null ? new Date(Number(values[field.key])) : new Date()}
+                    mode="date"
+                    onChange={(event, selected) => {
+                      setDatePickerFor(null);
+                      if (event.type === 'set' && selected) setValue(field.key, selected.getTime());
+                    }}
+                  />
+                )}
+              </>
             )}
 
             {field.type === 'longText' && (
