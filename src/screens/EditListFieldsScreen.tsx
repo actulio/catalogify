@@ -14,7 +14,7 @@ import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository
 import { useAuth } from '../services/auth';
 import { theme } from '../theme/theme';
 import { PressableScale } from '../components/PressableScale';
-import { useKeyboardPadding } from '../hooks/useKeyboardPadding';
+import { useKeyboardSpacerStyle } from '../hooks/useKeyboardSpacer';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditListFields'>;
 
@@ -64,7 +64,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
   const [coverUri, setCoverUri] = useState<string | undefined>(existing?.coverUrl);
   const [saving, setSaving] = useState(false);
   const listRef = useRef<RNFlatList<FieldDef>>(null);
-  const keyboardPad = useKeyboardPadding();
+  const keyboardSpacer = useKeyboardSpacerStyle();
 
   function addField() {
     setFields((prev) => [
@@ -127,11 +127,11 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
         ref={listRef}
         data={fields}
         keyExtractor={(f) => f.key}
-        contentContainerClassName="gap-4 pb-6"
-        contentContainerStyle={keyboardPad as any}
+        contentContainerStyle={{ gap: 16, paddingBottom: 24 }}
         keyboardShouldPersistTaps="handled"
         itemLayoutAnimation={LinearTransition.duration(220)}
         showsVerticalScrollIndicator={false}
+        ListFooterComponent={<Animated.View style={keyboardSpacer} />}
         ListHeaderComponent={
           <View className="gap-6 mb-4">
             <View className="gap-2">
@@ -189,8 +189,8 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
             <Animated.View
               entering={FadeInDown.duration(250)}
               exiting={SlideOutLeft.duration(200)}
-              className="bg-surface-container-low rounded-lg p-4 gap-3"
             >
+              <View className="bg-surface-container-low rounded-lg p-4 gap-3">
               <TextInput
                 className="font-label-md text-label-md text-on-surface border-b border-outline-variant/40 pb-1"
                 placeholder="Field label"
@@ -250,6 +250,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
                   <Text className="font-label-sm text-label-sm text-error">Remove field</Text>
                 </PressableScale>
               )}
+              </View>
             </Animated.View>
           );
         }}

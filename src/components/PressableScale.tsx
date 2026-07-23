@@ -9,18 +9,21 @@ import Animated, {
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
-type Props = PressableProps & {
+type Props = Omit<PressableProps, 'children'> & {
   /** How far to scale down on press-in. Default 0.96. */
   activeScale?: number;
+  children?: React.ReactNode;
 };
 
 /**
  * Pressable that gives tactile feedback: scales to `activeScale` and dips
- * opacity while pressed, springing back on release. Forwards all Pressable
- * props (onPress, disabled, className via NativeWind, etc.).
+ * opacity while pressed, springing back on release. The animation lives on the
+ * (reanimated) pressable itself; any `className` is applied to an inner plain
+ * View so NativeWind resolves it (NativeWind does not interop reanimated's
+ * animated components, so `className` on the AnimatedPressable would be dropped).
  */
 export const PressableScale = forwardRef<View, Props>(function PressableScale(
-  { activeScale = 0.96, onPressIn, onPressOut, disabled, style: styleProp, ...rest },
+  { activeScale = 0.96, onPressIn, onPressOut, disabled, style: styleProp, className, children, ...rest },
   ref
 ) {
   const scale = useSharedValue(1);
@@ -47,6 +50,8 @@ export const PressableScale = forwardRef<View, Props>(function PressableScale(
       }}
       {...rest}
       style={[styleProp, animatedStyle]}
-    />
+    >
+      <View className={className}>{children}</View>
+    </AnimatedPressable>
   );
 });

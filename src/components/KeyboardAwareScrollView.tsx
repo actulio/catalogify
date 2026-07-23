@@ -7,19 +7,22 @@ import {
   TextInput,
 } from 'react-native';
 import Animated from 'react-native-reanimated';
-import { useKeyboardPadding } from '../hooks/useKeyboardPadding';
+import { useKeyboardSpacerStyle } from '../hooks/useKeyboardSpacer';
 
 type Props = ScrollViewProps & { children: React.ReactNode };
 
 /**
- * ScrollView that keeps the focused input visible above the keyboard: it grows
- * its bottom padding with the keyboard height (reanimated) and, when the keyboard
- * appears, scrolls the currently-focused input above it. Drop-in replacement for
- * a plain ScrollView — no per-input wiring needed.
+ * ScrollView that keeps the focused input visible above the keyboard. It renders
+ * a keyboard-height spacer as its last child (so there is scrollable room to
+ * lift inputs) and, when the keyboard appears, scrolls the currently-focused
+ * input above it. Drop-in replacement for a plain ScrollView — no per-input
+ * wiring needed. A plain ScrollView (not Animated.ScrollView) is used on purpose
+ * so NativeWind's `className` / `contentContainerClassName` still apply; only the
+ * spacer is animated.
  */
 export const KeyboardAwareScrollView = forwardRef<ScrollView, Props>(
-  function KeyboardAwareScrollView({ children, contentContainerStyle, ...rest }, ref) {
-    const padStyle = useKeyboardPadding();
+  function KeyboardAwareScrollView({ children, ...rest }, ref) {
+    const spacerStyle = useKeyboardSpacerStyle();
     const scrollRef = useRef<ScrollView | null>(null);
 
     useEffect(() => {
@@ -36,18 +39,18 @@ export const KeyboardAwareScrollView = forwardRef<ScrollView, Props>(
     }, []);
 
     return (
-      <Animated.ScrollView
-        ref={(r: any) => {
-          scrollRef.current = r as unknown as ScrollView;
-          if (typeof ref === 'function') ref(r as any);
+      <ScrollView
+        ref={(r) => {
+          scrollRef.current = r;
+          if (typeof ref === 'function') ref(r);
           else if (ref) (ref as any).current = r;
         }}
         keyboardShouldPersistTaps="handled"
-        contentContainerStyle={[contentContainerStyle, padStyle]}
         {...rest}
       >
         {children}
-      </Animated.ScrollView>
+        <Animated.View style={spacerStyle} />
+      </ScrollView>
     );
   }
 );
