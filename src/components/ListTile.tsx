@@ -18,7 +18,7 @@ export function ListTile({ list, itemCount, onPress }: Props) {
         <>
           <Image
             source={{ uri: list.coverUrl }}
-            className="absolute inset-0 w-full h-full"
+            className="absolute inset-0"
             resizeMode="cover"
           />
           {/* Solid dark scrim behind the text so the name/count stay legible over
