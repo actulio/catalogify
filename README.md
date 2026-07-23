@@ -95,6 +95,16 @@ Google Sign-In uses [`@react-native-google-signin/google-signin`](https://github
 
    These are written `to public` with an explicit `auth.jwt()->>'sub'` check rather than `to authenticated`, which is what Supabase's own Firebase-integration guide demonstrates. Their approach needs every Firebase user tagged with a `role: 'authenticated'` custom claim (via a Cloud Function), but Firebase Cloud Functions themselves require the Blaze plan — reintroducing the exact billing dependency this setup is meant to avoid. Checking the uid directly in the policy sidesteps that. **This hasn't been verified against a live Supabase project yet** — test an upload and a read once you've completed setup, and adjust if the policies don't behave as expected.
 
+## Keeping the Supabase project awake
+
+The free Supabase tier pauses the database after 7 days of inactivity. This app
+pings a tiny `keepalive` table on launch and schedules a 5-day local reminder to
+reopen the app when you've been idle.
+
+**One-time setup:** open the Supabase dashboard → SQL Editor and run
+[`docs/supabase-keepalive.sql`](docs/supabase-keepalive.sql). Without this table
+the launch ping logs a warning and is a no-op (the app still works).
+
 ## Environment variables
 
 Copy the example file and fill in the values from your Firebase Web app config, Google OAuth client IDs, and Supabase project:
