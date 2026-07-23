@@ -7,6 +7,7 @@ import { FieldValue } from '../domain/types';
 import { validateItem, hasErrors, ValidationErrors } from '../domain/validation';
 import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository';
 import { useAuth } from '../services/auth';
+import { useInvalidateCatalog } from '../hooks/useCatalogQueries';
 import { theme } from '../theme/theme';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ItemForm'>;
@@ -14,6 +15,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ItemForm'>;
 export function ItemFormScreen({ route, navigation }: Props) {
   const { list, item } = route.params;
   const { user } = useAuth();
+  const invalidate = useInvalidateCatalog(list.id);
   const [title, setTitle] = useState(item?.title ?? '');
   const [values, setValues] = useState<Record<string, FieldValue>>(item?.values ?? {});
   const [photoUri, setPhotoUri] = useState<string | undefined>(item?.photoUrl);
@@ -44,6 +46,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
       } else {
         await repo.addItem(list.id, title, values, photoToUpload);
       }
+      invalidate();
       navigation.goBack();
     } catch (error) {
       console.error('Failed to save item', error);
@@ -64,6 +67,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
           try {
             const repo = new FirebaseCatalogRepository(user.uid);
             await repo.deleteItem(list.id, item.id);
+            invalidate();
             navigation.goBack();
           } catch (error) {
             console.error('Failed to delete item', error);

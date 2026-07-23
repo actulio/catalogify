@@ -1,11 +1,10 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { CatalogList } from '../domain/types';
-import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository';
+import { useLists, useItemCounts } from '../hooks/useCatalogQueries';
 import { useAuth } from '../services/auth';
 import { ListTile } from '../components/ListTile';
 import { theme } from '../theme/theme';
@@ -18,9 +17,8 @@ type GridCell =
 
 export function HomeScreen({ navigation }: Props) {
   const { user } = useAuth();
-  const [lists, setLists] = useState<CatalogList[]>([]);
-  const [counts, setCounts] = useState<Record<string, number>>({});
-  const [loading, setLoading] = useState(true);
+  const { data: lists = [], isLoading } = useLists();
+  const { data: counts = {} } = useItemCounts(lists.map((l) => l.id));
   const [search, setSearch] = useState('');
 
   const filteredLists = useMemo(() => {
@@ -36,29 +34,7 @@ export function HomeScreen({ navigation }: Props) {
     return cells;
   }, [filteredLists]);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!user) return;
-      let active = true;
-      const repo = new FirebaseCatalogRepository(user.uid);
-      setLoading(true);
-      repo
-        .getLists()
-        .then(async (fetched) => {
-          if (!active) return;
-          setLists(fetched);
-          setCounts(await repo.getItemCounts(fetched.map((l) => l.id)));
-        })
-        .finally(() => {
-          if (active) setLoading(false);
-        });
-      return () => {
-        active = false;
-      };
-    }, [user])
-  );
-
-  if (loading) {
+  if (isLoading) {
     return (
       <View className="flex-1 bg-background items-center justify-center">
         <ActivityIndicator size="large" color={theme.colors.primary} />
