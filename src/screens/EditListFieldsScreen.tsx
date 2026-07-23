@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Pressable, FlatList, Image, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, FlatList, Image, Alert, Switch } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -212,6 +212,18 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
                       </Pressable>
                     );
                   })}
+                </View>
+              )}
+              {(item.type === 'rating' || item.type === 'number') && (
+                <View className="flex-row items-center justify-between">
+                  <Text className="font-label-md text-label-md text-on-surface-variant">
+                    Allow sorting by this field
+                  </Text>
+                  <Switch
+                    value={item.sortable !== false}
+                    onValueChange={(v) => updateField(index, { sortable: v })}
+                    trackColor={{ true: theme.colors.primary }}
+                  />
                 </View>
               )}
               {!locked && (
