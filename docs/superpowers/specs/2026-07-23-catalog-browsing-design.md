@@ -49,7 +49,7 @@ The repository returns **all items for a catalog**; a pure module derives filter
 - **`domain/itemQuery.ts`** (new, pure, no I/O):
   - `applyQuery(items, { searchText, filters, sort }) → CatalogItem[]`
   - `computeStats(items, fields) → CatalogStats`
-- The server-side `searchText` / `sortByRatingKey` behavior in `FirebaseCatalogRepository.getItems` is **retired**; the repo exposes a plain "get all items for list" read.
+- The app **stops passing a query** to `FirebaseCatalogRepository.getItems` — it calls `getItems(listId)` to fetch all items and derives everything via `itemQuery`. The repo's optional `query` path is left in place as emulator-tested legacy (removing it would break `FirebaseCatalogRepository.test.ts`) and can be cleaned up in a follow-up.
 
 **Why:** arbitrary-field filtering, arbitrary sort, and filter-aware stats are painful and brittle server-side in Firestore (composite indexes per field, no easy multi-field AND) and buy nothing at personal-catalog scale. A pure in-memory module is trivially fast here, fully unit-testable without Firestore mocks, and keeps all browsing logic in one place.
 
