@@ -7,6 +7,7 @@ import { HomeScreen } from '../screens/HomeScreen';
 import { EditListFieldsScreen } from '../screens/EditListFieldsScreen';
 import { ListDetailScreen } from '../screens/ListDetailScreen';
 import { ItemFormScreen } from '../screens/ItemFormScreen';
+import { ItemDetailScreen } from '../screens/ItemDetailScreen';
 import { CatalogList, CatalogItem } from '../domain/types';
 import { theme } from '../theme/theme';
 
@@ -15,6 +16,7 @@ export type RootStackParamList = {
   EditListFields: { list?: CatalogList };
   ListDetail: { list: CatalogList };
   ItemForm: { list: CatalogList; item?: CatalogItem };
+  ItemDetail: { list: CatalogList; item: CatalogItem };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -46,6 +48,7 @@ export function RootNavigator() {
             <Stack.Screen name="EditListFields" component={EditListFieldsScreen} />
             <Stack.Screen name="ListDetail" component={ListDetailScreen} />
             <Stack.Screen name="ItemForm" component={ItemFormScreen} />
+            <Stack.Screen name="ItemDetail" component={ItemDetailScreen} />
           </>
         )}
       </Stack.Navigator>

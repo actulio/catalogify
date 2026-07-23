@@ -131,7 +131,7 @@ export function ListDetailScreen({ route, navigation }: Props) {
           <ItemCard
             item={item}
             list={list}
-            onPress={() => navigation.navigate('ItemForm', { list, item })}
+            onPress={() => navigation.navigate('ItemDetail', { list, item })}
           />
         )}
         ListEmptyComponent={
