@@ -1,4 +1,4 @@
-import { Pressable, Text } from 'react-native';
+import { Pressable, Text, View, Image } from 'react-native';
 import { CatalogList } from '../domain/types';
 
 interface Props {
@@ -8,15 +8,36 @@ interface Props {
 }
 
 export function ListTile({ list, itemCount, onPress }: Props) {
+  const hasCover = !!list.coverUrl;
   return (
     <Pressable
       onPress={onPress}
       className="w-[48%] aspect-[4/5] bg-surface-container rounded-lg overflow-hidden justify-end p-4"
     >
-      <Text className="font-headline-sm text-headline-sm text-on-surface" numberOfLines={2}>
+      {hasCover && (
+        <>
+          <Image
+            source={{ uri: list.coverUrl }}
+            className="absolute inset-0 w-full h-full"
+            resizeMode="cover"
+          />
+          {/* Solid dark scrim behind the text so the name/count stay legible over
+              any cover. A true gradient would need the native expo-linear-gradient
+              module (and a dev rebuild); a solid scrim works on a plain JS reload. */}
+          <View className="absolute inset-x-0 bottom-0 h-1/2 bg-black/45" />
+        </>
+      )}
+      <Text
+        className={`font-headline-sm text-headline-sm ${hasCover ? 'text-white' : 'text-on-surface'}`}
+        numberOfLines={2}
+      >
         {list.name}
       </Text>
-      <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-tighter mt-1">
+      <Text
+        className={`font-label-sm text-label-sm uppercase tracking-tighter mt-1 ${
+          hasCover ? 'text-white/80' : 'text-on-surface-variant'
+        }`}
+      >
         {itemCount} {itemCount === 1 ? 'item' : 'items'}
       </Text>
     </Pressable>
