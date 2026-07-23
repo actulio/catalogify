@@ -26,7 +26,9 @@ Make a catalog something you can *browse and understand*, not just add to. Today
 - **Filters** — type-aware, one control per filterable field, **AND-combined**:
   - rating / number → min–max range ("at least X")
   - boolean → Yes / No / Any
-  - date → date range
+  - date → date range (filters a custom `date` field's value)
+
+  **Date-storage note (added post-review):** the `date` field type was previously free-text with no picker. As part of this work it is firmed up: a `date` value is stored as **milliseconds since epoch** (a number), entered via `@react-native-community/datetimepicker` in the item form, and the date-range filter matches against that value.
   - text fields (`shortText` / `longText`) → **no filter control** (the search box already covers text)
 - **Clear all** resets filters only and returns sort to the default (Date added, newest first); it does not touch the search box.
 - Search + filters + sort all feed the same client-side pipeline.
@@ -35,7 +37,7 @@ Make a catalog something you can *browse and understand*, not just add to. Today
 - New `CatalogStats` component: a **collapsible strip above the item list**, collapsed by default, one tap to expand.
 - Derived automatically from the catalog's field schema — no configuration:
   - total item count
-  - per `rating` field → average + distribution
+  - per `rating` field → average (a per-score distribution is computed-then-deferred; not shown in v1)
   - per `number` field → average / min / max
   - per `boolean` field → count yes / no
 - **Filter-aware:** stats are computed over the *currently filtered* set, so they double as live feedback for the active filters (e.g. "12 items · avg 8.6").
