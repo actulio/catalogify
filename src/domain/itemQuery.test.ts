@@ -1,4 +1,4 @@
-import { applyQuery, Filters } from './itemQuery';
+import { applyQuery, Filters, SortSpec } from './itemQuery';
 import { CatalogItem } from './types';
 
 function item(partial: Partial<CatalogItem> & { id: string }): CatalogItem {
@@ -56,5 +56,31 @@ describe('applyQuery — filters', () => {
   it('dateRange filters on createdAt inclusive', () => {
     const filters: Filters = { __date: { kind: 'dateRange', from: 150, to: 250 } };
     expect(applyQuery(items, { filters }).map((i) => i.id)).toEqual(['b']);
+  });
+});
+
+describe('applyQuery — sort', () => {
+  const sortIds = (sort: SortSpec) => applyQuery(items, { sort }).map((i) => i.id);
+
+  it('sorts by dateAdded desc (newest first)', () => {
+    expect(sortIds({ field: { kind: 'dateAdded' }, direction: 'desc' })).toEqual(['a', 'b', 'c']);
+  });
+
+  it('sorts by dateAdded asc', () => {
+    expect(sortIds({ field: { kind: 'dateAdded' }, direction: 'asc' })).toEqual(['c', 'b', 'a']);
+  });
+
+  it('sorts by title A-Z', () => {
+    expect(sortIds({ field: { kind: 'title' }, direction: 'asc' })).toEqual(['b', 'c', 'a']);
+  });
+
+  it('sorts by a numeric field desc', () => {
+    expect(sortIds({ field: { kind: 'field', key: 'price' }, direction: 'desc' })).toEqual(['a', 'c', 'b']);
+  });
+
+  it('does not mutate the input array', () => {
+    const before = items.map((i) => i.id);
+    applyQuery(items, { sort: { field: { kind: 'field', key: 'rating' }, direction: 'asc' } });
+    expect(items.map((i) => i.id)).toEqual(before);
   });
 });

@@ -22,9 +22,19 @@ export type Filters = Record<string, Filter>;
 
 export const DATE_FILTER_KEY = '__date';
 
+export type SortField =
+  | { kind: 'dateAdded' }
+  | { kind: 'title' }
+  | { kind: 'field'; key: string }; // a rating or number field
+export interface SortSpec {
+  field: SortField;
+  direction: 'asc' | 'desc';
+}
+
 export interface ItemQuerySpec {
   searchText?: string;
   filters?: Filters;
+  sort?: SortSpec;
 }
 
 function matchesSearch(item: CatalogItem, needle: string): boolean {
@@ -65,6 +75,22 @@ export function applyQuery(items: CatalogItem[], spec: ItemQuerySpec): CatalogIt
     for (const [key, filter] of Object.entries(spec.filters)) {
       result = result.filter((i) => matchesFilter(i, key, filter));
     }
+  }
+
+  if (spec.sort) {
+    const { field, direction } = spec.sort;
+    const dir = direction === 'asc' ? 1 : -1;
+    result = [...result].sort((a, b) => {
+      let cmp: number;
+      if (field.kind === 'title') {
+        cmp = a.title.localeCompare(b.title);
+      } else if (field.kind === 'dateAdded') {
+        cmp = a.createdAt - b.createdAt;
+      } else {
+        cmp = Number(a.values[field.key] ?? 0) - Number(b.values[field.key] ?? 0);
+      }
+      return cmp * dir;
+    });
   }
 
   return result;
