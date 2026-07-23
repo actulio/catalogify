@@ -23,10 +23,15 @@ Reference: https://docs.expo.dev/versions/v57.0.0/ and the reanimated docs for l
 
 Quick check step:
 
-- [ ] **Confirm the exports exist**
+- [ ] **Confirm the exports exist via typecheck**
 
-Run: `cd /Users/work/personal/random/catalogify && node -e "const r=require('react-native-reanimated'); console.log(['default','useAnimatedKeyboard','useAnimatedStyle','useSharedValue','FadeInDown','SlideOutLeft','LinearTransition','withSpring'].map(k=>k+':'+(typeof (k==='default'?r.default:r[k]))).join('\n'))"`
-Expected: each name prints a non-`undefined` type (`function` or `object`). If a layout preset prints `undefined`, check the reanimated version's export names and adjust later tasks.
+Do NOT try to `require()` reanimated or react-native in plain Node — they are
+Metro-only (Flow/ESM) and will throw `ERR_MODULE_NOT_FOUND` /
+`Unexpected token 'typeof'`. Instead, the imports in each task's code are type-
+checked by `npx tsc --noEmit`. If any named export (`useAnimatedKeyboard`,
+`FadeInDown`, `SlideOutLeft`, `LinearTransition`) does not exist in the installed
+4.5.0 typings, tsc will report `has no exported member` — adjust the import to the
+correct name from the reanimated 4 docs and note it in the commit.
 
 ---
 
@@ -118,8 +123,8 @@ git commit -m "feat: PressableScale reusable pressable with press feedback"
 ## Task 2: `useKeyboardPadding` hook + `KeyboardAwareScrollView`
 
 Shared hook that returns an animated style adding bottom padding equal to the
-keyboard height, plus a scroll container that uses it and scrolls the focused
-input into view.
+keyboard height, plus a scroll container that uses it and, on keyboard show,
+scrolls the currently-focused input above the keyboard.
 
 **Files:**
 - Create: `src/hooks/useKeyboardPadding.ts`
@@ -145,9 +150,31 @@ export function useKeyboardPadding() {
 
 - [ ] **Step 2: Create the scroll container**
 
+Two things happen here, and they are deliberately separate mechanisms:
+
+1. **Room** — `useKeyboardPadding()` grows the content's bottom padding to the
+   keyboard height so any input *can* be scrolled clear of the keyboard. This is
+   the reanimated part and the smooth-motion the user asked for. (Note: with
+   `useAnimatedKeyboard` the app reads the keyboard inset itself rather than the
+   OS auto-resizing the window, so this manual padding is the correct pattern —
+   do NOT also add `android:adjustResize` / `softwareKeyboardLayoutMode`.)
+2. **Bring the focused input up** — on `keyboardDidShow`, ask the ScrollView's
+   scroll responder to scroll the currently-focused native input above the
+   keyboard. `scrollResponderScrollNativeHandleToKeyboard` is the long-standing RN
+   method (the same one `react-native-keyboard-aware-scroll-view` uses); it does
+   the offset math from the keyboard frame internally. This is generic — no
+   per-`TextInput` wiring. Do NOT use `onFocus`/`onFocusCapture` on the ScrollView:
+   focus does not bubble to parent views in React Native, so those never fire.
+
 ```tsx
-import { forwardRef, useCallback } from 'react';
-import { findNodeHandle, ScrollView, ScrollViewProps, TextInput } from 'react-native';
+import { forwardRef, useEffect, useRef } from 'react';
+import {
+  findNodeHandle,
+  Keyboard,
+  ScrollView,
+  ScrollViewProps,
+  TextInput,
+} from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useKeyboardPadding } from '../hooks/useKeyboardPadding';
 
@@ -155,37 +182,37 @@ type Props = ScrollViewProps & { children: React.ReactNode };
 
 /**
  * ScrollView that keeps the focused input visible above the keyboard: it grows
- * its bottom padding with the keyboard height and scrolls the focused input
- * into view on focus. Drop-in replacement for a plain ScrollView.
+ * its bottom padding with the keyboard height (reanimated) and, when the keyboard
+ * appears, scrolls the currently-focused input above it. Drop-in replacement for
+ * a plain ScrollView — no per-input wiring needed.
  */
 export const KeyboardAwareScrollView = forwardRef<ScrollView, Props>(
-  function KeyboardAwareScrollView({ children, contentContainerStyle, onScroll, ...rest }, ref) {
+  function KeyboardAwareScrollView({ children, contentContainerStyle, ...rest }, ref) {
     const padStyle = useKeyboardPadding();
+    const scrollRef = useRef<ScrollView | null>(null);
 
-    // Scroll the focused input into view. Uses the internal scrollResponder so it
-    // works regardless of the animated wrapper.
-    const scrollRef = useRef<ScrollView>(null);
-    const handleFocus = useCallback((e: any) => {
-      const node = findNodeHandle(e.target);
-      const responder = scrollRef.current?.getScrollResponder?.();
-      if (node && responder?.scrollResponderScrollNativeHandleToKeyboard) {
-        responder.scrollResponderScrollNativeHandleToKeyboard(node, 120, true);
-      }
+    useEffect(() => {
+      const sub = Keyboard.addListener('keyboardDidShow', () => {
+        const focused = TextInput.State.currentlyFocusedInput?.();
+        const responder = (scrollRef.current as any)?.getScrollResponder?.();
+        const node = focused ? findNodeHandle(focused) : null;
+        if (node != null && responder?.scrollResponderScrollNativeHandleToKeyboard) {
+          // 24 = extra px kept above the keyboard; true = don't overscroll past top.
+          responder.scrollResponderScrollNativeHandleToKeyboard(node, 24, true);
+        }
+      });
+      return () => sub.remove();
     }, []);
 
     return (
       <Animated.ScrollView
         ref={(r) => {
-          // @ts-expect-error assigning to both refs
-          scrollRef.current = r;
+          scrollRef.current = r as unknown as ScrollView;
           if (typeof ref === 'function') ref(r as any);
           else if (ref) (ref as any).current = r;
         }}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[contentContainerStyle, padStyle]}
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-        onFocusCapture={handleFocus}
         {...rest}
       >
         {children}
@@ -195,19 +222,17 @@ export const KeyboardAwareScrollView = forwardRef<ScrollView, Props>(
 );
 ```
 
-Add the missing import at the top: `import { useRef } from 'react';` (merge into
-the existing react import line).
-
-Note: `onFocusCapture` catches focus bubbling up from any `TextInput` child, so
-individual inputs need no wiring. `scrollResponderScrollNativeHandleToKeyboard`
-is the long-standing RN scroll responder method; the `120` is the extra gap in
-px kept above the keyboard.
+Note: `TextInput.State.currentlyFocusedInput()` is the documented way to get the
+focused input node without wiring every field. Everything is null-guarded, so if
+the scroll-responder method is unavailable on some platform the padding alone
+still prevents the input from being trapped behind the keyboard.
 
 - [ ] **Step 3: Typecheck**
 
 Run: `cd /Users/work/personal/random/catalogify && npx tsc --noEmit`
-Expected: no errors in the two new files. If `getScrollResponder` typing is
-strict, the `?.` optional chaining already guards it at runtime.
+Expected: no errors in the two new files. If `currentlyFocusedInput` or
+`getScrollResponder` are missing from the RN typings, keep the `?.`/`as any`
+guards already present — they are runtime-safe.
 
 - [ ] **Step 4: Commit**
 
