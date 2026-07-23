@@ -1,5 +1,5 @@
-import { applyQuery, Filters, SortSpec } from './itemQuery';
-import { CatalogItem } from './types';
+import { applyQuery, Filters, SortSpec, computeStats } from './itemQuery';
+import { CatalogItem, FieldDef } from './types';
 
 function item(partial: Partial<CatalogItem> & { id: string }): CatalogItem {
   return {
@@ -82,5 +82,40 @@ describe('applyQuery — sort', () => {
     const before = items.map((i) => i.id);
     applyQuery(items, { sort: { field: { kind: 'field', key: 'rating' }, direction: 'asc' } });
     expect(items.map((i) => i.id)).toEqual(before);
+  });
+});
+
+const fields: FieldDef[] = [
+  { key: 'rating', label: 'Rating', type: 'rating', required: false, ratingScale: { max: 10 } },
+  { key: 'price', label: 'Price', type: 'number', required: false },
+  { key: 'decaf', label: 'Decaf', type: 'boolean', required: false },
+  { key: 'notes', label: 'Notes', type: 'longText', required: false },
+];
+
+describe('computeStats', () => {
+  it('counts total items', () => {
+    expect(computeStats(items, fields).total).toBe(3);
+  });
+
+  it('computes rating average and number min/max', () => {
+    const stats = computeStats(items, fields);
+    const rating = stats.fields.find((f) => f.key === 'rating');
+    const price = stats.fields.find((f) => f.key === 'price');
+    expect(rating).toMatchObject({ type: 'rating', average: (9 + 6 + 8) / 3 });
+    expect(price).toMatchObject({ type: 'number', min: 25, max: 40, average: (40 + 25 + 32) / 3 });
+  });
+
+  it('counts boolean yes/no', () => {
+    const decaf = computeStats(items, fields).fields.find((f) => f.key === 'decaf');
+    expect(decaf).toMatchObject({ type: 'boolean', yes: 1, no: 2 });
+  });
+
+  it('ignores non-summarisable field types (text)', () => {
+    expect(computeStats(items, fields).fields.some((f) => f.key === 'notes')).toBe(false);
+  });
+
+  it('returns null averages for an empty set', () => {
+    const rating = computeStats([], fields).fields.find((f) => f.key === 'rating');
+    expect(rating).toMatchObject({ average: null });
   });
 });

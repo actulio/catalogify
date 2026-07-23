@@ -95,3 +95,81 @@ export function applyQuery(items: CatalogItem[], spec: ItemQuerySpec): CatalogIt
 
   return result;
 }
+
+export interface RatingStat {
+  key: string;
+  label: string;
+  type: 'rating';
+  count: number;
+  average: number | null;
+  distribution: Record<number, number>;
+}
+export interface NumberStat {
+  key: string;
+  label: string;
+  type: 'number';
+  count: number;
+  average: number | null;
+  min: number | null;
+  max: number | null;
+}
+export interface BooleanStat {
+  key: string;
+  label: string;
+  type: 'boolean';
+  yes: number;
+  no: number;
+}
+export type FieldStat = RatingStat | NumberStat | BooleanStat;
+
+export interface CatalogStatsData {
+  total: number;
+  fields: FieldStat[];
+}
+
+function numericValues(items: CatalogItem[], key: string): number[] {
+  return items
+    .map((i) => i.values[key])
+    .filter((v) => v !== null && v !== undefined && v !== '' && !Number.isNaN(Number(v)))
+    .map((v) => Number(v));
+}
+
+export function computeStats(items: CatalogItem[], fields: FieldDef[]): CatalogStatsData {
+  const stats: FieldStat[] = [];
+
+  for (const field of fields) {
+    if (field.type === 'rating' || field.type === 'number') {
+      const nums = numericValues(items, field.key);
+      const count = nums.length;
+      const average = count ? nums.reduce((s, n) => s + n, 0) / count : null;
+      if (field.type === 'rating') {
+        const distribution: Record<number, number> = {};
+        for (const n of nums) {
+          const bucket = Math.round(n);
+          distribution[bucket] = (distribution[bucket] ?? 0) + 1;
+        }
+        stats.push({ key: field.key, label: field.label, type: 'rating', count, average, distribution });
+      } else {
+        stats.push({
+          key: field.key,
+          label: field.label,
+          type: 'number',
+          count,
+          average,
+          min: count ? Math.min(...nums) : null,
+          max: count ? Math.max(...nums) : null,
+        });
+      }
+    } else if (field.type === 'boolean') {
+      let yes = 0;
+      let no = 0;
+      for (const i of items) {
+        if (i.values[field.key] === true) yes += 1;
+        else no += 1;
+      }
+      stats.push({ key: field.key, label: field.label, type: 'boolean', yes, no });
+    }
+  }
+
+  return { total: items.length, fields: stats };
+}
