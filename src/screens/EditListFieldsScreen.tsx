@@ -8,6 +8,7 @@ import { FieldDef, FieldType } from '../domain/types';
 import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository';
 import { useAuth } from '../services/auth';
 import { theme } from '../theme/theme';
+import { PressableScale } from '../components/PressableScale';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditListFields'>;
 
@@ -227,24 +228,24 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
                 </View>
               )}
               {!locked && (
-                <Pressable onPress={() => removeField(index)}>
+                <PressableScale onPress={() => removeField(index)}>
                   <Text className="font-label-sm text-label-sm text-error">Remove field</Text>
-                </Pressable>
+                </PressableScale>
               )}
             </View>
           );
         }}
       />
-      <Pressable className="py-4 items-center" onPress={addField}>
+      <PressableScale className="py-4 items-center" onPress={addField}>
         <Text className="font-label-md text-label-md text-primary">+ Add field</Text>
-      </Pressable>
-      <Pressable
+      </PressableScale>
+      <PressableScale
         className={`bg-primary rounded-lg py-4 items-center ${saving ? 'opacity-60' : ''}`}
         onPress={save}
         disabled={saving}
       >
         <Text className="text-white text-base">{saving ? 'Saving...' : 'Save'}</Text>
-      </Pressable>
+      </PressableScale>
     </View>
   );
 }
