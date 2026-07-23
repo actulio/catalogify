@@ -9,6 +9,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import Slider from '@react-native-community/slider';
 import { CatalogList } from '../domain/types';
 import { Filters, SortField, SortSpec, DEFAULT_SORT } from '../domain/itemQuery';
 import { theme } from '../theme/theme';
@@ -30,7 +31,7 @@ function sortOptions(list: CatalogList): { label: string; field: SortField }[] {
     { label: 'Title', field: { kind: 'title' } },
   ];
   for (const f of list.fields) {
-    if (f.type === 'rating' || f.type === 'number') {
+    if ((f.type === 'rating' || f.type === 'number') && f.sortable !== false) {
       opts.push({ label: f.label, field: { kind: 'field', key: f.key } });
     }
   }
@@ -83,7 +84,8 @@ export function FilterSortSheet({
   }
 
   const boolFields = list.fields.filter((f) => f.type === 'boolean');
-  const rangeFields = list.fields.filter((f) => f.type === 'rating' || f.type === 'number');
+  const ratingFields = list.fields.filter((f) => f.type === 'rating');
+  const numberFields = list.fields.filter((f) => f.type === 'number');
   const dateFields = list.fields.filter((f) => f.type === 'date');
 
   return (
@@ -115,23 +117,51 @@ export function FilterSortSheet({
                   }`}
                 >
                   <Text className="font-body-md text-body-md text-on-surface">{opt.label}</Text>
-                  {active && (
-                    <MaterialIcons
-                      name={sort.direction === 'asc' ? 'arrow-upward' : 'arrow-downward'}
-                      size={18}
-                      color={theme.colors.primary}
-                    />
-                  )}
+                  <MaterialIcons
+                    name={
+                      active && sort.direction === 'asc' ? 'arrow-upward' : 'arrow-downward'
+                    }
+                    size={18}
+                    color={active ? theme.colors.primary : theme.colors.onSurfaceVariant}
+                  />
                 </Pressable>
               );
             })}
           </View>
 
-          {(rangeFields.length > 0 || boolFields.length > 0 || dateFields.length > 0) && (
+          {(ratingFields.length > 0 ||
+            numberFields.length > 0 ||
+            boolFields.length > 0 ||
+            dateFields.length > 0) && (
             <Text className="font-headline-sm text-headline-sm text-on-surface mb-3">Filters</Text>
           )}
 
-          {rangeFields.map((f) => {
+          {ratingFields.map((f) => {
+            const current = filters[f.key];
+            const min = current?.kind === 'range' && current.min !== undefined ? current.min : 0;
+            const max = f.ratingScale?.max ?? 10;
+            return (
+              <View key={f.key} className="mb-4">
+                <Text className="font-label-md text-label-md text-on-surface-variant mb-2">
+                  {f.label}: {min === 0 ? 'any' : `at least ${min}`}
+                </Text>
+                <Slider
+                  minimumValue={0}
+                  maximumValue={max}
+                  step={1}
+                  value={min}
+                  onSlidingComplete={(v) =>
+                    setFilter(f.key, v === 0 ? undefined : { kind: 'range', min: v })
+                  }
+                  minimumTrackTintColor={theme.colors.primary}
+                  maximumTrackTintColor={theme.colors.outlineVariant}
+                  thumbTintColor={theme.colors.primary}
+                />
+              </View>
+            );
+          })}
+
+          {numberFields.map((f) => {
             const current = filters[f.key];
             const min = current?.kind === 'range' ? current.min : undefined;
             return (
@@ -140,7 +170,7 @@ export function FilterSortSheet({
                   {f.label}: at least {min ?? 'any'}
                 </Text>
                 <View className="flex-row flex-wrap gap-2">
-                  {[undefined, ...thresholdsFor(f.type as 'rating' | 'number', f.ratingScale?.max)].map((t, idx) => {
+                  {[undefined, ...NUMBER_THRESHOLDS].map((t, idx) => {
                     const selected = min === t;
                     return (
                       <Pressable
@@ -265,16 +295,8 @@ export function FilterSortSheet({
   );
 }
 
-// Threshold chips: ratings step by 2 up to their max (default 10); numbers use a
-// small generic ladder. Kept simple deliberately — a range slider is future work.
-function thresholdsFor(type: 'rating' | 'number', ratingMax = 10): number[] {
-  if (type === 'rating') {
-    const out: number[] = [];
-    for (let t = 2; t <= ratingMax; t += 2) out.push(t);
-    return out;
-  }
-  return [10, 25, 50, 100];
-}
+// Number filter offers a small fixed ladder of "at least" thresholds.
+const NUMBER_THRESHOLDS = [10, 25, 50, 100];
 
 const styles = StyleSheet.create({
   backdrop: { backgroundColor: 'rgba(0,0,0,0.4)' },
