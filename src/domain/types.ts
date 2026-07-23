@@ -26,6 +26,7 @@ export interface CatalogList {
   id: string;
   name: string;
   fields: FieldDef[];
+  coverUrl?: string;
   createdAt: number;
 }
 

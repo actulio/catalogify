@@ -9,8 +9,9 @@ export interface ItemQuery {
 
 export interface CatalogRepository {
   getLists(): Promise<CatalogList[]>;
-  createList(name: string, fields: FieldDef[]): Promise<CatalogList>;
+  createList(name: string, fields: FieldDef[], coverUri?: string): Promise<CatalogList>;
   updateListFields(listId: string, fields: FieldDef[]): Promise<void>;
+  updateListCover(listId: string, coverUri: string): Promise<string>;
   deleteList(listId: string): Promise<void>;
 
   getItemCounts(listIds: string[]): Promise<Record<string, number>>;

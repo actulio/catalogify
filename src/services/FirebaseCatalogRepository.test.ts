@@ -104,7 +104,7 @@ describe('FirebaseCatalogRepository', () => {
     expect(remove).toHaveBeenCalledWith([`${uid}/lists/${list.id}/items/${item.id}/photo.jpg`]);
   });
 
-  it('removes every item photo from storage when a list is deleted', async () => {
+  it('removes every item photo and the cover from storage when a list is deleted', async () => {
     const list = await repo.createList('Coffees', []);
     const a = await repo.addItem(list.id, 'A', {});
     const b = await repo.addItem(list.id, 'B', {});
@@ -118,8 +118,40 @@ describe('FirebaseCatalogRepository', () => {
       expect.arrayContaining([
         `${uid}/lists/${list.id}/items/${a.id}/photo.jpg`,
         `${uid}/lists/${list.id}/items/${b.id}/photo.jpg`,
+        `${uid}/lists/${list.id}/cover.jpg`,
       ])
     );
-    expect(paths).toHaveLength(2);
+    expect(paths).toHaveLength(3);
+  });
+
+  it('stores a cover on create and returns it from getLists', async () => {
+    const url = 'https://signed.example/cover.jpg';
+    jest.spyOn(repo as never as { uploadCover: () => Promise<string> }, 'uploadCover').mockResolvedValue(url);
+
+    const list = await repo.createList('Cafes', [], 'file://local-cover.jpg');
+    expect(list.coverUrl).toBe(url);
+
+    const lists = await repo.getLists();
+    expect(lists.find((l) => l.id === list.id)?.coverUrl).toBe(url);
+  });
+
+  it('leaves coverUrl undefined when no cover is provided on create', async () => {
+    const list = await repo.createList('NoCover', []);
+    expect(list.coverUrl).toBeUndefined();
+
+    const lists = await repo.getLists();
+    expect(lists.find((l) => l.id === list.id)?.coverUrl).toBeUndefined();
+  });
+
+  it('updates the cover via updateListCover', async () => {
+    const url = 'https://signed.example/new-cover.jpg';
+    const list = await repo.createList('Cafes', []);
+    jest.spyOn(repo as never as { uploadCover: () => Promise<string> }, 'uploadCover').mockResolvedValue(url);
+
+    const returned = await repo.updateListCover(list.id, 'file://local.jpg');
+    expect(returned).toBe(url);
+
+    const lists = await repo.getLists();
+    expect(lists.find((l) => l.id === list.id)?.coverUrl).toBe(url);
   });
 });
