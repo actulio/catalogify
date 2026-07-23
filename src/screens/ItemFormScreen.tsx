@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ScrollView, View, Text, TextInput, Pressable, Image, Switch, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, Image, Switch, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -10,6 +10,7 @@ import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository
 import { useAuth } from '../services/auth';
 import { useInvalidateCatalog } from '../hooks/useCatalogQueries';
 import { theme } from '../theme/theme';
+import { KeyboardAwareScrollView } from '../components/KeyboardAwareScrollView';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ItemForm'>;
 
@@ -81,7 +82,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
   }
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="p-5 gap-8 pb-16">
+    <KeyboardAwareScrollView className="flex-1 bg-background" contentContainerClassName="p-5 gap-8 pb-16">
       <View className="gap-2">
         <Text className="font-label-md text-label-sm uppercase tracking-widest text-on-surface-variant">
           Item Title
@@ -209,6 +210,6 @@ export function ItemFormScreen({ route, navigation }: Props) {
           <Text className="text-error text-center">Delete item</Text>
         </Pressable>
       )}
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 }
