@@ -20,6 +20,9 @@ export interface FieldDef {
   type: FieldType;
   required: boolean;
   ratingScale?: RatingScale;
+  // For rating/number fields: whether this field is offered as a sort option.
+  // undefined = sortable (default, backward-compatible with existing catalogs).
+  sortable?: boolean;
 }
 
 export interface CatalogList {

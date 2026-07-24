@@ -1,24 +1,29 @@
 import { useState } from 'react';
-import { ScrollView, View, Text, TextInput, Pressable, Image, Switch, Alert } from 'react-native';
+import { View, Text, TextInput, Pressable, Image, Switch, Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { FieldValue } from '../domain/types';
 import { validateItem, hasErrors, ValidationErrors } from '../domain/validation';
 import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository';
 import { useAuth } from '../services/auth';
+import { useInvalidateCatalog } from '../hooks/useCatalogQueries';
 import { theme } from '../theme/theme';
+import { FormScreen } from '../components/FormScreen';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ItemForm'>;
 
 export function ItemFormScreen({ route, navigation }: Props) {
   const { list, item } = route.params;
   const { user } = useAuth();
+  const invalidate = useInvalidateCatalog(list.id);
   const [title, setTitle] = useState(item?.title ?? '');
   const [values, setValues] = useState<Record<string, FieldValue>>(item?.values ?? {});
   const [photoUri, setPhotoUri] = useState<string | undefined>(item?.photoUrl);
   const [errors, setErrors] = useState<ValidationErrors>({});
   const [saving, setSaving] = useState(false);
+  const [datePickerFor, setDatePickerFor] = useState<string | null>(null);
 
   function setValue(key: string, value: FieldValue) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -44,6 +49,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
       } else {
         await repo.addItem(list.id, title, values, photoToUpload);
       }
+      invalidate();
       navigation.goBack();
     } catch (error) {
       console.error('Failed to save item', error);
@@ -64,6 +70,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
           try {
             const repo = new FirebaseCatalogRepository(user.uid);
             await repo.deleteItem(list.id, item.id);
+            invalidate();
             navigation.goBack();
           } catch (error) {
             console.error('Failed to delete item', error);
@@ -75,7 +82,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
   }
 
   return (
-    <ScrollView className="flex-1 bg-background" contentContainerClassName="p-5 gap-8 pb-16">
+    <FormScreen className="flex-1 bg-background" contentContainerClassName="p-5 gap-8 pb-16">
       <View className="gap-2">
         <Text className="font-label-md text-label-sm uppercase tracking-widest text-on-surface-variant">
           Item Title
@@ -115,7 +122,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
               {field.label}
             </Text>
 
-            {(field.type === 'shortText' || field.type === 'number' || field.type === 'date') && (
+            {(field.type === 'shortText' || field.type === 'number') && (
               <TextInput
                 className="bg-surface-container-low border border-surface-dim rounded-lg p-4 font-body-md text-body-md text-on-surface"
                 placeholderClassName="text-surface-dim"
@@ -125,6 +132,35 @@ export function ItemFormScreen({ route, navigation }: Props) {
                 }
                 keyboardType={field.type === 'number' ? 'numeric' : 'default'}
               />
+            )}
+
+            {field.type === 'date' && (
+              <>
+                <Pressable
+                  onPress={() => setDatePickerFor(field.key)}
+                  className="bg-surface-container-low border border-surface-dim rounded-lg p-4"
+                >
+                  <Text className="font-body-md text-body-md text-on-surface">
+                    {values[field.key] != null
+                      ? new Date(Number(values[field.key])).toLocaleDateString(undefined, {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })
+                      : 'Tap to pick a date'}
+                  </Text>
+                </Pressable>
+                {datePickerFor === field.key && (
+                  <DateTimePicker
+                    value={values[field.key] != null ? new Date(Number(values[field.key])) : new Date()}
+                    mode="date"
+                    onChange={(event, selected) => {
+                      setDatePickerFor(null);
+                      if (event.type === 'set' && selected) setValue(field.key, selected.getTime());
+                    }}
+                  />
+                )}
+              </>
             )}
 
             {field.type === 'longText' && (
@@ -174,6 +210,6 @@ export function ItemFormScreen({ route, navigation }: Props) {
           <Text className="text-error text-center">Delete item</Text>
         </Pressable>
       )}
-    </ScrollView>
+    </FormScreen>
   );
 }
