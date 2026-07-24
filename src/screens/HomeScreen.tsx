@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { CatalogList } from '../domain/types';
 import { useLists, useItemCounts } from '../hooks/useCatalogQueries';
@@ -18,6 +19,21 @@ export function HomeScreen({ navigation }: Props) {
   const { data: lists = [], isLoading } = useLists();
   const { data: counts = {} } = useItemCounts(lists.map((l) => l.id));
   const [search, setSearch] = useState('');
+  const { t } = useTranslation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={() => navigation.navigate('Settings')}
+          accessibilityLabel={t('home.openSettings')}
+          accessibilityRole="button"
+        >
+          <MaterialIcons name="settings" size={22} color={theme.colors.primary} />
+        </Pressable>
+      ),
+    });
+  }, [navigation, t]);
 
   const filteredLists = useMemo(() => {
     const needle = search.trim().toLowerCase();
