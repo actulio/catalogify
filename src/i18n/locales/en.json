@@ -13,7 +13,9 @@
     "item_other": "{{count}} items"
   },
   "signIn": {
-    "signInWithGoogle": "Sign in with Google"
+    "signInWithGoogle": "Sign in with Google",
+    "tagline": "Catalog the things you love.",
+    "footer": "Your personal catalogs"
   },
   "home": {
     "searchPlaceholder": "Search catalogs",

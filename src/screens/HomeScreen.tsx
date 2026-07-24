@@ -61,7 +61,7 @@ export function HomeScreen({ navigation }: Props) {
       <View className="px-5 pt-4 pb-1">
         <TextInput
           className="bg-surface-container-low rounded-lg p-4 font-body-md text-body-md text-on-surface"
-          placeholder="Search catalogs"
+          placeholder={t('home.searchPlaceholder')}
           placeholderClassName="text-surface-dim"
           value={search}
           onChangeText={setSearch}
@@ -92,7 +92,7 @@ export function HomeScreen({ navigation }: Props) {
                 <MaterialIcons name="add" size={26} color={theme.colors.outline} />
               </View>
               <Text className="font-label-md text-label-md text-secondary uppercase tracking-widest">
-                New Catalog
+                {t('home.newCatalog')}
               </Text>
             </Pressable>
           );
