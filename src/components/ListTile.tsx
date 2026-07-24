@@ -1,4 +1,5 @@
 import { Pressable, Text, View, Image } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { CatalogList } from '../domain/types';
 
 interface Props {
@@ -8,6 +9,7 @@ interface Props {
 }
 
 export function ListTile({ list, itemCount, onPress }: Props) {
+  const { t } = useTranslation();
   const hasCover = !!list.coverUrl;
   return (
     <Pressable
@@ -38,7 +40,7 @@ export function ListTile({ list, itemCount, onPress }: Props) {
           hasCover ? 'text-white/80' : 'text-on-surface-variant'
         }`}
       >
-        {itemCount} {itemCount === 1 ? 'item' : 'items'}
+        {t('common.item', { count: itemCount })}
       </Text>
     </Pressable>
   );

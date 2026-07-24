@@ -62,17 +62,28 @@
     "fieldLabelPlaceholder": "Field label"
   },
   "catalogActions": {
+    "title": "Catalog Actions",
     "close": "Close catalog actions",
     "edit": "Edit Catalog",
     "delete": "Delete Catalog"
   },
   "filterSort": {
+    "sortBy": "Sort by",
+    "filters": "Filters",
     "sortDateAdded": "Date added",
     "sortTitle": "Title",
     "any": "Any",
     "yes": "Yes",
     "no": "No",
     "from": "From",
-    "to": "To"
+    "to": "To",
+    "atLeast": "at least {{value}}",
+    "clear": "Clear",
+    "clearAll": "Clear all"
+  },
+  "stats": {
+    "average": "avg {{value}}",
+    "averageRange": "avg {{avg}} · {{min}}–{{max}}",
+    "yesNo": "{{yes}} yes · {{no}} no"
   }
 }

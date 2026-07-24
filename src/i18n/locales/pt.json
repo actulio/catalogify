@@ -62,17 +62,28 @@
     "fieldLabelPlaceholder": "Nome do campo"
   },
   "catalogActions": {
+    "title": "Ações do Catálogo",
     "close": "Fechar ações do catálogo",
     "edit": "Editar catálogo",
     "delete": "Excluir catálogo"
   },
   "filterSort": {
+    "sortBy": "Ordenar por",
+    "filters": "Filtros",
     "sortDateAdded": "Data de adição",
     "sortTitle": "Título",
     "any": "Qualquer",
     "yes": "Sim",
     "no": "Não",
     "from": "De",
-    "to": "Até"
+    "to": "Até",
+    "atLeast": "pelo menos {{value}}",
+    "clear": "Limpar",
+    "clearAll": "Limpar tudo"
+  },
+  "stats": {
+    "average": "média {{value}}",
+    "averageRange": "média {{avg}} · {{min}}–{{max}}",
+    "yesNo": "{{yes}} sim · {{no}} não"
   }
 }

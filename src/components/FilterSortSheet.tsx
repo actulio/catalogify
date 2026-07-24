@@ -10,6 +10,8 @@ import Animated, {
 import { MaterialIcons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Slider from '@react-native-community/slider';
+import { useTranslation } from 'react-i18next';
+import type { TFunction } from 'i18next';
 import { CatalogList } from '../domain/types';
 import { Filters, SortField, SortSpec, DEFAULT_SORT } from '../domain/itemQuery';
 import { theme } from '../theme/theme';
@@ -25,10 +27,10 @@ interface Props {
 }
 
 // Sortable options: date, title, then each rating/number field in the schema.
-function sortOptions(list: CatalogList): { label: string; field: SortField }[] {
+function sortOptions(list: CatalogList, t: TFunction): { label: string; field: SortField }[] {
   const opts: { label: string; field: SortField }[] = [
-    { label: 'Date added', field: { kind: 'dateAdded' } },
-    { label: 'Title', field: { kind: 'title' } },
+    { label: t('filterSort.sortDateAdded'), field: { kind: 'dateAdded' } },
+    { label: t('filterSort.sortTitle'), field: { kind: 'title' } },
   ];
   for (const f of list.fields) {
     if ((f.type === 'rating' || f.type === 'number') && f.sortable !== false) {
@@ -53,6 +55,7 @@ export function FilterSortSheet({
   filters,
   onFiltersChange,
 }: Props) {
+  const { t } = useTranslation();
   const [rendered, setRendered] = useState(visible);
   const [datePickerFor, setDatePickerFor] = useState<{ key: string; bound: 'from' | 'to' } | null>(null);
   const progress = useSharedValue(0);
@@ -99,9 +102,11 @@ export function FilterSortSheet({
         className="absolute inset-x-0 bottom-0 bg-surface-container rounded-t-3xl p-5"
       >
         <ScrollView showsVerticalScrollIndicator={false}>
-          <Text className="font-headline-sm text-headline-sm text-on-surface mb-3">Sort by</Text>
+          <Text className="font-headline-sm text-headline-sm text-on-surface mb-3">
+            {t('filterSort.sortBy')}
+          </Text>
           <View className="gap-2 mb-6">
-            {sortOptions(list).map((opt) => {
+            {sortOptions(list, t).map((opt) => {
               const active = sameField(sort.field, opt.field);
               return (
                 <Pressable
@@ -133,7 +138,9 @@ export function FilterSortSheet({
             numberFields.length > 0 ||
             boolFields.length > 0 ||
             dateFields.length > 0) && (
-            <Text className="font-headline-sm text-headline-sm text-on-surface mb-3">Filters</Text>
+            <Text className="font-headline-sm text-headline-sm text-on-surface mb-3">
+              {t('filterSort.filters')}
+            </Text>
           )}
 
           {ratingFields.map((f) => {
@@ -143,7 +150,7 @@ export function FilterSortSheet({
             return (
               <View key={f.key} className="mb-4">
                 <Text className="font-label-md text-label-md text-on-surface-variant mb-2">
-                  {f.label}: {min === 0 ? 'any' : `at least ${min}`}
+                  {f.label}: {min === 0 ? t('filterSort.any') : t('filterSort.atLeast', { value: min })}
                 </Text>
                 <Slider
                   minimumValue={0}
@@ -167,23 +174,27 @@ export function FilterSortSheet({
             return (
               <View key={f.key} className="mb-4">
                 <Text className="font-label-md text-label-md text-on-surface-variant mb-2">
-                  {f.label}: at least {min ?? 'any'}
+                  {f.label}:{' '}
+                  {min === undefined ? t('filterSort.any') : t('filterSort.atLeast', { value: min })}
                 </Text>
                 <View className="flex-row flex-wrap gap-2">
-                  {[undefined, ...NUMBER_THRESHOLDS].map((t, idx) => {
-                    const selected = min === t;
+                  {[undefined, ...NUMBER_THRESHOLDS].map((threshold, idx) => {
+                    const selected = min === threshold;
                     return (
                       <Pressable
                         key={idx}
                         onPress={() =>
-                          setFilter(f.key, t === undefined ? undefined : { kind: 'range', min: t })
+                          setFilter(
+                            f.key,
+                            threshold === undefined ? undefined : { kind: 'range', min: threshold }
+                          )
                         }
                         className={`px-3 py-2 rounded-full border ${
                           selected ? 'border-primary bg-primary/10' : 'border-outline-variant/40'
                         }`}
                       >
                         <Text className="font-label-md text-label-md text-on-surface">
-                          {t === undefined ? 'Any' : `${t}+`}
+                          {threshold === undefined ? t('filterSort.any') : `${threshold}+`}
                         </Text>
                       </Pressable>
                     );
@@ -197,9 +208,9 @@ export function FilterSortSheet({
             const current = filters[f.key];
             const val = current?.kind === 'boolean' ? current.value : undefined;
             const options: { label: string; value: boolean | undefined }[] = [
-              { label: 'Any', value: undefined },
-              { label: 'Yes', value: true },
-              { label: 'No', value: false },
+              { label: t('filterSort.any'), value: undefined },
+              { label: t('filterSort.yes'), value: true },
+              { label: t('filterSort.no'), value: false },
             ];
             return (
               <View key={f.key} className="mb-4">
@@ -232,7 +243,9 @@ export function FilterSortSheet({
             const current = filters[f.key];
             const range = current?.kind === 'dateRange' ? current : undefined;
             const label = (ms?: number) =>
-              ms === undefined ? 'Any' : new Date(ms).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+              ms === undefined
+                ? t('filterSort.any')
+                : new Date(ms).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
             function setBound(bound: 'from' | 'to', ms: number | undefined) {
               const next = { ...(range ?? { kind: 'dateRange' as const }) };
               if (ms === undefined) delete next[bound];
@@ -254,14 +267,14 @@ export function FilterSortSheet({
                       }`}
                     >
                       <Text className="font-label-sm text-label-sm text-on-surface-variant">
-                        {bound === 'from' ? 'From' : 'To'}
+                        {bound === 'from' ? t('filterSort.from') : t('filterSort.to')}
                       </Text>
                       <Text className="font-body-md text-body-md text-on-surface">{label(range?.[bound])}</Text>
                     </Pressable>
                   ))}
                   {range && (
                     <Pressable onPress={() => setFilter(f.key, undefined)} className="px-3 py-2 justify-center">
-                      <Text className="font-label-md text-label-md text-primary">Clear</Text>
+                      <Text className="font-label-md text-label-md text-primary">{t('filterSort.clear')}</Text>
                     </Pressable>
                   )}
                 </View>
@@ -287,7 +300,7 @@ export function FilterSortSheet({
             }}
             className="mt-2 mb-1 py-3 items-center"
           >
-            <Text className="font-label-md text-label-md text-primary">Clear all</Text>
+            <Text className="font-label-md text-label-md text-primary">{t('filterSort.clearAll')}</Text>
           </Pressable>
         </ScrollView>
       </Animated.View>
