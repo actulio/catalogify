@@ -7,6 +7,7 @@
     "couldNotSaveBody": "Please try again.",
     "couldNotDelete": "Could not delete",
     "couldNotDeleteBody": "Please try again.",
+    "saving": "Saving...",
     "yes": "Yes",
     "no": "No",
     "item_one": "{{count}} item",
@@ -45,21 +46,42 @@
   "itemForm": {
     "namePlaceholder": "Enter name...",
     "pickDate": "Tap to pick a date",
-    "deleteItem": "Delete item"
+    "deleteItem": "Delete item",
+    "itemTitleLabel": "Item Title",
+    "galleryImageLabel": "Gallery Image",
+    "tapToAddPhoto": "Tap to add photo"
   },
   "itemDetail": {
     "fallbackTitle": "Item",
     "editItem": "Edit item",
     "deleteItem": "Delete item",
     "deleteItemTitle": "Delete item?",
-    "deleteItemMessage": "This removes \"{{title}}\" permanently."
+    "deleteItemMessage": "This removes \"{{title}}\" permanently.",
+    "noPhoto": "No photo"
   },
   "editFields": {
     "namePlaceholder": "Catalog Name",
     "nameHelp": "Give your catalog a name. This is what you'll see on the home screen.",
     "coverHelp": "Optional. Shown behind the catalog name on the home screen.",
     "fieldsHelp": "Choose what details each item in this catalog will have.",
-    "fieldLabelPlaceholder": "Field label"
+    "fieldLabelPlaceholder": "Field label",
+    "catalogIdentityLabel": "Catalog Identity",
+    "coverImageLabel": "Cover Image",
+    "tapToAddCover": "Tap to add cover",
+    "attributesSchemaLabel": "Attributes & Schema",
+    "alwaysIncludedRequired": "Always included · required",
+    "allowSortingLabel": "Allow sorting by this field",
+    "removeField": "Remove field",
+    "addField": "+ Add field",
+    "fieldType": {
+      "shortText": "Short text",
+      "longText": "Long text",
+      "number": "Number",
+      "rating": "Rating",
+      "photo": "Photo",
+      "boolean": "Boolean",
+      "date": "Date"
+    }
   },
   "catalogActions": {
     "title": "Catalog Actions",
