@@ -1,0 +1,76 @@
+{
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "couldNotSave": "Não foi possível salvar",
+    "couldNotSaveBody": "Tente novamente.",
+    "couldNotDelete": "Não foi possível excluir",
+    "couldNotDeleteBody": "Tente novamente.",
+    "yes": "Sim",
+    "no": "Não",
+    "item_one": "{{count}} item",
+    "item_other": "{{count}} itens"
+  },
+  "signIn": {
+    "signInWithGoogle": "Entrar com Google"
+  },
+  "home": {
+    "searchPlaceholder": "Buscar catálogos",
+    "newCatalog": "Novo Catálogo",
+    "openSettings": "Configurações"
+  },
+  "settings": {
+    "title": "Configurações",
+    "languageSection": "Idioma",
+    "languagePortuguese": "Português",
+    "languageEnglish": "English"
+  },
+  "listDetail": {
+    "searchPlaceholder": "Buscar",
+    "filterSort": "Filtrar e ordenar",
+    "catalogActions": "Ações do catálogo",
+    "addItem": "Adicionar item",
+    "toggleStats": "Alternar estatísticas do catálogo",
+    "deleteListTitle": "Excluir lista?",
+    "deleteListMessage": "Isso remove \"{{name}}\" e todos os seus itens permanentemente.",
+    "couldNotDeleteList": "Não foi possível excluir a lista",
+    "emptyTitle": "Este catálogo está vazio",
+    "emptyBody": "Toque em + para adicionar seu primeiro item.",
+    "noMatchesTitle": "Nenhum resultado",
+    "noMatchesBody": "Tente ajustar sua busca ou filtros."
+  },
+  "itemForm": {
+    "namePlaceholder": "Digite o nome...",
+    "pickDate": "Toque para escolher uma data",
+    "deleteItem": "Excluir item"
+  },
+  "itemDetail": {
+    "fallbackTitle": "Item",
+    "editItem": "Editar item",
+    "deleteItem": "Excluir item",
+    "deleteItemTitle": "Excluir item?",
+    "deleteItemMessage": "Isso remove \"{{title}}\" permanentemente."
+  },
+  "editFields": {
+    "namePlaceholder": "Nome do Catálogo",
+    "nameHelp": "Dê um nome ao seu catálogo. É o que você verá na tela inicial.",
+    "coverHelp": "Opcional. Exibido atrás do nome do catálogo na tela inicial.",
+    "fieldsHelp": "Escolha quais detalhes cada item deste catálogo terá.",
+    "fieldLabelPlaceholder": "Nome do campo"
+  },
+  "catalogActions": {
+    "close": "Fechar ações do catálogo",
+    "edit": "Editar catálogo",
+    "delete": "Excluir catálogo"
+  },
+  "filterSort": {
+    "sortDateAdded": "Data de adição",
+    "sortTitle": "Título",
+    "any": "Qualquer",
+    "yes": "Sim",
+    "no": "Não",
+    "from": "De",
+    "to": "Até"
+  }
+}
