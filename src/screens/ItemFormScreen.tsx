@@ -10,7 +10,7 @@ import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository
 import { useAuth } from '../services/auth';
 import { useInvalidateCatalog } from '../hooks/useCatalogQueries';
 import { theme } from '../theme/theme';
-import { KeyboardAwareScrollView } from '../components/KeyboardAwareScrollView';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ItemForm'>;
 
@@ -82,7 +82,12 @@ export function ItemFormScreen({ route, navigation }: Props) {
   }
 
   return (
-    <KeyboardAwareScrollView className="flex-1 bg-background" contentContainerClassName="p-5 gap-8 pb-16">
+    <KeyboardAwareScrollView
+      className="flex-1 bg-background"
+      contentContainerClassName="p-5 gap-8 pb-16"
+      bottomOffset={32}
+      keyboardShouldPersistTaps="handled"
+    >
       <View className="gap-2">
         <Text className="font-label-md text-label-sm uppercase tracking-widest text-on-surface-variant">
           Item Title

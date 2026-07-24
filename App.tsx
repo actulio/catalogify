@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import { AppState } from 'react-native';
 import { onAuthStateChanged } from 'firebase/auth';
 import { QueryClientProvider } from '@tanstack/react-query';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { RootNavigator } from './src/navigation/RootNavigator';
 import { useAppFonts } from './src/theme/useAppFonts';
 import { auth } from './src/services/firebase';
@@ -43,8 +44,10 @@ export default function App() {
   if (!loaded) return null;
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <RootNavigator />
-    </QueryClientProvider>
+    <KeyboardProvider>
+      <QueryClientProvider client={queryClient}>
+        <RootNavigator />
+      </QueryClientProvider>
+    </KeyboardProvider>
   );
 }
