@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
-import { View, Text, TextInput, Pressable, FlatList as RNFlatList, Image, Alert, Switch } from 'react-native';
+import { View, Text, TextInput, Pressable, Image, Alert, Switch } from 'react-native';
+import { KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
 import Animated, {
   FadeInDown,
   SlideOutLeft,
@@ -14,7 +15,7 @@ import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository
 import { useAuth } from '../services/auth';
 import { theme } from '../theme/theme';
 import { PressableScale } from '../components/PressableScale';
-import { useKeyboardSpacerStyle, useKeyboardVisible } from '../hooks/useKeyboardSpacer';
+import { FormScreen } from '../components/FormScreen';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'EditListFields'>;
 
@@ -63,9 +64,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
   const [fields, setFields] = useState<FieldDef[]>(existing?.fields ?? [makeRatingField()]);
   const [coverUri, setCoverUri] = useState<string | undefined>(existing?.coverUrl);
   const [saving, setSaving] = useState(false);
-  const listRef = useRef<RNFlatList<FieldDef>>(null);
-  const keyboardSpacer = useKeyboardSpacerStyle();
-  const keyboardVisible = useKeyboardVisible();
+  const scrollRef = useRef<KeyboardAwareScrollViewRef>(null);
 
   function addField() {
     setFields((prev) => [
@@ -73,7 +72,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
       { key: `field_${prev.length}_${Date.now()}`, label: '', type: 'shortText', required: false },
     ]);
     // Reveal the freshly appended card once it has laid out.
-    requestAnimationFrame(() => listRef.current?.scrollToEnd({ animated: true }));
+    requestAnimationFrame(() => scrollRef.current?.scrollToEnd({ animated: true }));
   }
 
   function updateField(index: number, patch: Partial<FieldDef>) {
@@ -123,149 +122,150 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
   }
 
   return (
-    <View className="flex-1 bg-background p-5">
-      <Animated.FlatList
-        ref={listRef}
-        data={fields}
-        keyExtractor={(f) => f.key}
-        contentContainerStyle={{ gap: 16, paddingBottom: 24 }}
-        keyboardShouldPersistTaps="handled"
-        itemLayoutAnimation={LinearTransition.duration(220)}
+    <View className="flex-1 bg-background">
+      <FormScreen
+        ref={scrollRef}
+        className="flex-1"
+        contentContainerClassName="p-5 gap-4 pb-6"
         showsVerticalScrollIndicator={false}
-        ListFooterComponent={keyboardVisible ? <Animated.View style={keyboardSpacer} /> : null}
-        ListHeaderComponent={
-          <View className="gap-6 mb-4">
-            <View className="gap-2">
-              <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
-                Catalog Identity
-              </Text>
-              <TextInput
-                className="font-headline-md text-headline-md text-on-surface border-b border-outline-variant/40 pb-2"
-                placeholder="Catalog Name"
-                placeholderClassName="text-surface-dim"
-                value={name}
-                onChangeText={setName}
-                editable={!existing}
-              />
-              <Text className="font-body-md text-body-md text-on-surface-variant">
-                Give your catalog a name. This is what you'll see on the home screen.
-              </Text>
-            </View>
-            <View className="gap-2">
-              <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
-                Cover Image
-              </Text>
-              <Pressable onPress={pickCover}>
-                {coverUri ? (
-                  <Image
-                    source={{ uri: coverUri }}
-                    className="w-32 aspect-[4/5] rounded-lg"
-                    resizeMode="cover"
-                  />
-                ) : (
-                  <View className="w-32 aspect-[4/5] rounded-lg border-2 border-dashed border-surface-dim bg-surface-container-low items-center justify-center px-2">
-                    <Text className="font-label-md text-label-md text-on-surface-variant text-center">
-                      Tap to add cover
-                    </Text>
-                  </View>
-                )}
-              </Pressable>
-              <Text className="font-body-md text-body-md text-on-surface-variant">
-                Optional. Shown behind the catalog name on the home screen.
-              </Text>
-            </View>
-            <View className="gap-1">
-              <Text className="font-headline-sm text-headline-sm text-on-surface">
-                Attributes & Schema
-              </Text>
-              <Text className="font-body-md text-body-md text-on-surface-variant">
-                Choose what details each item in this catalog will have.
-              </Text>
-            </View>
+      >
+        <View className="gap-6">
+          <View className="gap-2">
+            <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
+              Catalog Identity
+            </Text>
+            <TextInput
+              className="font-headline-md text-headline-md text-on-surface border-b border-outline-variant/40 pb-2"
+              placeholder="Catalog Name"
+              placeholderClassName="text-surface-dim"
+              value={name}
+              onChangeText={setName}
+              editable={!existing}
+            />
+            <Text className="font-body-md text-body-md text-on-surface-variant">
+              Give your catalog a name. This is what you'll see on the home screen.
+            </Text>
           </View>
-        }
-        renderItem={({ item, index }) => {
+          <View className="gap-2">
+            <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
+              Cover Image
+            </Text>
+            <Pressable onPress={pickCover}>
+              {coverUri ? (
+                <Image
+                  source={{ uri: coverUri }}
+                  className="w-32 aspect-[4/5] rounded-lg"
+                  resizeMode="cover"
+                />
+              ) : (
+                <View className="w-32 aspect-[4/5] rounded-lg border-2 border-dashed border-surface-dim bg-surface-container-low items-center justify-center px-2">
+                  <Text className="font-label-md text-label-md text-on-surface-variant text-center">
+                    Tap to add cover
+                  </Text>
+                </View>
+              )}
+            </Pressable>
+            <Text className="font-body-md text-body-md text-on-surface-variant">
+              Optional. Shown behind the catalog name on the home screen.
+            </Text>
+          </View>
+          <View className="gap-1">
+            <Text className="font-headline-sm text-headline-sm text-on-surface">
+              Attributes & Schema
+            </Text>
+            <Text className="font-body-md text-body-md text-on-surface-variant">
+              Choose what details each item in this catalog will have.
+            </Text>
+          </View>
+        </View>
+
+        {fields.map((item, index) => {
           const locked = isLockedRating(item);
           return (
             <Animated.View
+              key={item.key}
               entering={FadeInDown.duration(250)}
               exiting={SlideOutLeft.duration(200)}
+              layout={LinearTransition.duration(220)}
             >
               <View className="bg-surface-container-low rounded-lg p-4 gap-3">
-              <TextInput
-                className="font-label-md text-label-md text-on-surface border-b border-outline-variant/40 pb-1"
-                placeholder="Field label"
-                placeholderClassName="text-surface-dim"
-                value={item.label}
-                onChangeText={(label) => updateField(index, { label })}
-              />
-              {locked ? (
-                <View className="flex-row items-center gap-2">
-                  <View className="flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary">
-                    <FieldTypeIcon type="rating" active />
-                    <Text className="font-label-sm text-label-sm text-white">rating</Text>
+                <TextInput
+                  className="font-label-md text-label-md text-on-surface border-b border-outline-variant/40 pb-1"
+                  placeholder="Field label"
+                  placeholderClassName="text-surface-dim"
+                  value={item.label}
+                  onChangeText={(label) => updateField(index, { label })}
+                />
+                {locked ? (
+                  <View className="flex-row items-center gap-2">
+                    <View className="flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary">
+                      <FieldTypeIcon type="rating" active />
+                      <Text className="font-label-sm text-label-sm text-white">rating</Text>
+                    </View>
+                    <Text className="font-label-sm text-label-sm text-on-surface-variant">
+                      Always included · required
+                    </Text>
                   </View>
-                  <Text className="font-label-sm text-label-sm text-on-surface-variant">
-                    Always included · required
-                  </Text>
-                </View>
-              ) : (
-                <View className="flex-row flex-wrap gap-2">
-                  {FIELD_TYPES.map((type) => {
-                    const active = item.type === type;
-                    return (
-                      <Pressable
-                        key={type}
-                        onPress={() => updateField(index, { type })}
-                        className={`flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant/40 ${
-                          active ? 'bg-primary' : 'bg-surface-container'
-                        }`}
-                      >
-                        <FieldTypeIcon type={type} active={active} />
-                        <Text
-                          className={`font-label-sm text-label-sm ${
-                            active ? 'text-white' : 'text-on-surface-variant'
+                ) : (
+                  <View className="flex-row flex-wrap gap-2">
+                    {FIELD_TYPES.map((type) => {
+                      const active = item.type === type;
+                      return (
+                        <Pressable
+                          key={type}
+                          onPress={() => updateField(index, { type })}
+                          className={`flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg border border-outline-variant/40 ${
+                            active ? 'bg-primary' : 'bg-surface-container'
                           }`}
                         >
-                          {type}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
-                </View>
-              )}
-              {(item.type === 'rating' || item.type === 'number') && (
-                <View className="flex-row items-center justify-between">
-                  <Text className="font-label-md text-label-md text-on-surface-variant">
-                    Allow sorting by this field
-                  </Text>
-                  <Switch
-                    value={item.sortable !== false}
-                    onValueChange={(v) => updateField(index, { sortable: v })}
-                    trackColor={{ true: theme.colors.primary }}
-                  />
-                </View>
-              )}
-              {!locked && (
-                <PressableScale onPress={() => removeField(index)}>
-                  <Text className="font-label-sm text-label-sm text-error">Remove field</Text>
-                </PressableScale>
-              )}
+                          <FieldTypeIcon type={type} active={active} />
+                          <Text
+                            className={`font-label-sm text-label-sm ${
+                              active ? 'text-white' : 'text-on-surface-variant'
+                            }`}
+                          >
+                            {type}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                )}
+                {(item.type === 'rating' || item.type === 'number') && (
+                  <View className="flex-row items-center justify-between">
+                    <Text className="font-label-md text-label-md text-on-surface-variant">
+                      Allow sorting by this field
+                    </Text>
+                    <Switch
+                      value={item.sortable !== false}
+                      onValueChange={(v) => updateField(index, { sortable: v })}
+                      trackColor={{ true: theme.colors.primary }}
+                    />
+                  </View>
+                )}
+                {!locked && (
+                  <PressableScale onPress={() => removeField(index)}>
+                    <Text className="font-label-sm text-label-sm text-error">Remove field</Text>
+                  </PressableScale>
+                )}
               </View>
             </Animated.View>
           );
-        }}
-      />
-      <PressableScale className="py-4 items-center" onPress={addField}>
-        <Text className="font-label-md text-label-md text-primary">+ Add field</Text>
-      </PressableScale>
-      <PressableScale
-        className={`bg-primary rounded-lg py-4 items-center ${saving ? 'opacity-60' : ''}`}
-        onPress={save}
-        disabled={saving}
-      >
-        <Text className="text-white text-base">{saving ? 'Saving...' : 'Save'}</Text>
-      </PressableScale>
+        })}
+      </FormScreen>
+
+      <View className="px-5 pb-5 pt-2 gap-2 bg-background">
+        <PressableScale className="py-4 items-center" onPress={addField}>
+          <Text className="font-label-md text-label-md text-primary">+ Add field</Text>
+        </PressableScale>
+        <PressableScale
+          className={`bg-primary rounded-lg py-4 items-center ${saving ? 'opacity-60' : ''}`}
+          onPress={save}
+          disabled={saving}
+        >
+          <Text className="text-white text-base">{saving ? 'Saving...' : 'Save'}</Text>
+        </PressableScale>
+      </View>
     </View>
   );
 }
