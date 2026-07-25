@@ -1,5 +1,5 @@
 import { useLayoutEffect, useMemo, useState } from 'react';
-import { View, TextInput, FlatList, Pressable, Text, Alert } from 'react-native';
+import { View, TextInput, FlatList, Pressable, Text, Alert, ActivityIndicator } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useTranslation } from 'react-i18next';
@@ -23,7 +23,7 @@ export function ListDetailScreen({ route, navigation }: Props) {
   const { t } = useTranslation();
   const { list } = route.params;
   const { user } = useAuth();
-  const { data: items = [] } = useItems(list.id);
+  const { data: items = [], isLoading } = useItems(list.id);
   const invalidate = useInvalidateCatalog(list.id);
 
   const [search, setSearch] = useState('');
@@ -127,25 +127,34 @@ export function ListDetailScreen({ route, navigation }: Props) {
           />
         )}
         ListEmptyComponent={
-          <View className="items-center pt-24 px-8 gap-3">
-            <View className="w-16 h-16 rounded-full bg-surface-container items-center justify-center">
-              <MaterialIcons
-                name={debouncedSearch.trim() || filterCount > 0 ? 'search-off' : 'inbox'}
-                size={30}
-                color={theme.colors.outline}
-              />
+          // While the first (uncached) fetch is in flight, show a spinner instead
+          // of the empty copy — otherwise "This catalog is empty" flashes before
+          // the items arrive. Cached opens skip this (isLoading is false).
+          isLoading ? (
+            <View className="items-center pt-24">
+              <ActivityIndicator size="large" color={theme.colors.primary} />
             </View>
-            <Text className="font-headline-sm text-headline-sm text-on-surface text-center">
-              {debouncedSearch.trim() || filterCount > 0
-                ? t('listDetail.noMatchesTitle')
-                : t('listDetail.emptyTitle')}
-            </Text>
-            <Text className="font-body-md text-body-md text-on-surface-variant text-center">
-              {debouncedSearch.trim() || filterCount > 0
-                ? t('listDetail.noMatchesBody')
-                : t('listDetail.emptyBody')}
-            </Text>
-          </View>
+          ) : (
+            <View className="items-center pt-24 px-8 gap-3">
+              <View className="w-16 h-16 rounded-full bg-surface-container items-center justify-center">
+                <MaterialIcons
+                  name={debouncedSearch.trim() || filterCount > 0 ? 'search-off' : 'inbox'}
+                  size={30}
+                  color={theme.colors.outline}
+                />
+              </View>
+              <Text className="font-headline-sm text-headline-sm text-on-surface text-center">
+                {debouncedSearch.trim() || filterCount > 0
+                  ? t('listDetail.noMatchesTitle')
+                  : t('listDetail.emptyTitle')}
+              </Text>
+              <Text className="font-body-md text-body-md text-on-surface-variant text-center">
+                {debouncedSearch.trim() || filterCount > 0
+                  ? t('listDetail.noMatchesBody')
+                  : t('listDetail.emptyBody')}
+              </Text>
+            </View>
+          )
         }
       />
 
