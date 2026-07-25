@@ -20,7 +20,7 @@ export default function App() {
   const [i18nReady, setI18nReady] = useState(false);
 
   useEffect(() => {
-    void initI18n().then(() => setI18nReady(true));
+    void initI18n().then(() => setI18nReady(true)).catch(() => setI18nReady(true));
   }, []);
 
   useEffect(() => {

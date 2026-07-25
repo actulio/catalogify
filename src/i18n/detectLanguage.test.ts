@@ -45,4 +45,10 @@ describe('resolveInitialLanguage', () => {
     mockGetLocales.mockReturnValue([{ languageCode: 'pt-BR' }]);
     await expect(resolveInitialLanguage()).resolves.toBe('pt');
   });
+
+  it('falls back to device locale when the stored-value read rejects', async () => {
+    mockGetItem.mockRejectedValue(new Error('storage unavailable'));
+    mockGetLocales.mockReturnValue([{ languageCode: 'pt' }]);
+    await expect(resolveInitialLanguage()).resolves.toBe('pt');
+  });
 });
