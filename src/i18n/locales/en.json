@@ -27,7 +27,9 @@
     "title": "Settings",
     "languageSection": "Language",
     "languagePortuguese": "Português",
-    "languageEnglish": "English"
+    "languageEnglish": "English",
+    "dataSection": "Data",
+    "importCatalog": "Import catalog"
   },
   "listDetail": {
     "searchPlaceholder": "Search",
@@ -87,7 +89,8 @@
     "title": "Catalog Actions",
     "close": "Close catalog actions",
     "edit": "Edit Catalog",
-    "delete": "Delete Catalog"
+    "delete": "Delete Catalog",
+    "export": "Export catalog"
   },
   "filterSort": {
     "sortBy": "Sort by",
@@ -107,5 +110,23 @@
     "average": "avg {{value}}",
     "averageRange": "avg {{avg}} · {{min}}–{{max}}",
     "yesNo": "{{yes}} yes · {{no}} no"
+  },
+  "transfer": {
+    "exportTitle": "Export catalog",
+    "importTitle": "Import catalog",
+    "preparing": "Preparing…",
+    "downloading": "Downloading photos {{done}}/{{total}}",
+    "building": "Compressing…",
+    "reading": "Reading file…",
+    "finishing": "Finishing…",
+    "cancel": "Cancel",
+    "canceled": "Operation canceled",
+    "exportSuccess": "Catalog exported",
+    "importSuccess": "Catalog imported",
+    "invalidFile": "Invalid or corrupted file",
+    "unsupportedVersion": "This file was created by a newer version of the app",
+    "genericError": "Something went wrong. Please try again.",
+    "cooldownRemaining": "Wait {{seconds}}s",
+    "sharingUnavailable": "Sharing is not available on this device"
   }
 }

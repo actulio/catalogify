@@ -27,7 +27,9 @@
     "title": "Configurações",
     "languageSection": "Idioma",
     "languagePortuguese": "Português",
-    "languageEnglish": "English"
+    "languageEnglish": "English",
+    "dataSection": "Dados",
+    "importCatalog": "Importar catálogo"
   },
   "listDetail": {
     "searchPlaceholder": "Buscar",
@@ -87,7 +89,8 @@
     "title": "Ações do Catálogo",
     "close": "Fechar ações do catálogo",
     "edit": "Editar catálogo",
-    "delete": "Excluir catálogo"
+    "delete": "Excluir catálogo",
+    "export": "Exportar catálogo"
   },
   "filterSort": {
     "sortBy": "Ordenar por",
@@ -107,5 +110,23 @@
     "average": "média {{value}}",
     "averageRange": "média {{avg}} · {{min}}–{{max}}",
     "yesNo": "{{yes}} sim · {{no}} não"
+  },
+  "transfer": {
+    "exportTitle": "Exportar catálogo",
+    "importTitle": "Importar catálogo",
+    "preparing": "Preparando…",
+    "downloading": "Baixando fotos {{done}}/{{total}}",
+    "building": "Compactando…",
+    "reading": "Lendo arquivo…",
+    "finishing": "Finalizando…",
+    "cancel": "Cancelar",
+    "canceled": "Operação cancelada",
+    "exportSuccess": "Catálogo exportado",
+    "importSuccess": "Catálogo importado",
+    "invalidFile": "Arquivo inválido ou corrompido",
+    "unsupportedVersion": "Este arquivo foi criado por uma versão mais recente do app",
+    "genericError": "Algo deu errado. Tente novamente.",
+    "cooldownRemaining": "Aguarde {{seconds}}s",
+    "sharingUnavailable": "Compartilhamento indisponível neste dispositivo"
   }
 }
