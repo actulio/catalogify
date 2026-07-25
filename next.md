@@ -1,6 +1,6 @@
 # Catalogify — Next Tasks
 
-_Last updated: 2026-07-24. Current state: **Localization (PT/EN) merged to `main`** (merge commit `f765f0b`); `feat/localization` deleted. One branch still open: **`fix/listdetail-stale-schema`** (stale-schema fix, green, unmerged — awaiting the device batch-check below). Working tree clean. No git remote — everything is local._
+_Last updated: 2026-07-24. Current state: all work on **`main`**, no open branches, working tree clean. Shipped this session: **Localization (PT/EN)** (merge `f765f0b`), **loading-spinner fix** (`169598a`), **stale-schema fix** (`ce2569c`, re-applied onto main). No git remote — everything is local. All three await the on-device checks below (one dev rebuild covers them)._
 
 > **⚠️ Next device build needs a dev-client REBUILD** — localization added `expo-localization` (native module); a JS reload won't pick it up. See the on-device checklist below.
 
@@ -17,7 +17,7 @@ _Last updated: 2026-07-24. Current state: **Localization (PT/EN) merged to `main
 - [ ] **Localization smoke (Task 12).** First launch: PT device → Portuguese UI; non-PT device → English. Settings (gear in Home header) → switch language → all screens re-render **instantly**, no reload; choice **survives restart**. Plural counts read right ("1 item"/"2 itens" PT; "1 item"/"2 items" EN) on Home tiles + stats bar. User content (catalog/field/item values) **unchanged** by language. Spot-check every screen for leftover English when in PT.
 - [ ] **Verify cache-refresh-after-edit.** After editing/adding/deleting an item, the list + counts + stats update without leaving/re-entering. Invalidation in `src/hooks/useCatalogQueries.ts` (mutations call `invalidate()` before `goBack()`).
 - [ ] **Loading-spinner fix (on `main`, commit `169598a`).** First (uncached) open of a catalog now shows a spinner instead of briefly flashing "This catalog is empty". Verify: open a catalog for the first time in a session → spinner → items (no empty-state flash). _Note: the catalog **stats bar** still momentarily shows 0s during that first load — minor, out of scope for this fix; flag if you want it gated too._
-- [ ] **Stale-schema fix (on branch `fix/listdetail-stale-schema`).** `ListDetailScreen` now derives the live list from `useLists()` by id (was reading the nav snapshot), so editing a catalog's fields reflects on back-nav. Verify: ⋮ → Edit fields → rename a label/toggle sortable → Save → change shows immediately without re-opening. **Then merge the branch** (green: tsc 0, tests pass). NOTE: this branch is NOT on `main` yet — merge it after verifying, or merge now if you want it in the same build.
+- [ ] **Stale-schema fix (on `main`, commit `ce2569c`).** `ListDetailScreen` now derives the live list from `useLists()` by id (was reading the nav snapshot), so editing a catalog's fields reflects on back-nav. Verify: ⋮ → Edit fields → rename a label/toggle sortable → Save → change shows immediately without re-opening.
 
 ## Backlog (each is its own session; brainstorm before building)
 - [ ] **Export / import** catalogs (e.g. JSON/CSV). — _next up; brainstorm started conceptually. Now that i18n exists, author its UI strings through `t(...)` from the start (keys in both pt.json/en.json)._
