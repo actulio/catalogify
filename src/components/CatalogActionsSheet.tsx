@@ -15,10 +15,17 @@ interface CatalogActionsSheetProps {
   visible: boolean;
   onClose: () => void;
   onEdit: () => void;
+  onExport: () => void;
   onDelete: () => void;
 }
 
-export function CatalogActionsSheet({ visible, onClose, onEdit, onDelete }: CatalogActionsSheetProps) {
+export function CatalogActionsSheet({
+  visible,
+  onClose,
+  onEdit,
+  onExport,
+  onDelete,
+}: CatalogActionsSheetProps) {
   const { t } = useTranslation();
   // Keep the Modal mounted through the close animation: `rendered` lags `visible`
   // so the sheet can finish sliding out before the native modal unmounts.
@@ -79,6 +86,17 @@ export function CatalogActionsSheet({ visible, onClose, onEdit, onDelete }: Cata
               <MaterialIcons name="edit" size={22} color={theme.colors.onSurfaceVariant} />
               <Text className="font-body-lg text-body-lg text-on-background">
                 {t('catalogActions.edit')}
+              </Text>
+            </Pressable>
+            <Pressable
+              onPress={onExport}
+              className="flex-row items-center gap-4 px-5 py-5"
+              accessibilityRole="button"
+              accessibilityLabel={t('catalogActions.export')}
+            >
+              <MaterialIcons name="ios-share" size={22} color={theme.colors.onSurfaceVariant} />
+              <Text className="font-body-lg text-body-lg text-on-background">
+                {t('catalogActions.export')}
               </Text>
             </Pressable>
             <Pressable

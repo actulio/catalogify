@@ -1,4 +1,4 @@
-import { useLayoutEffect, useMemo, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { View, TextInput, FlatList, Pressable, Text, Alert, ActivityIndicator } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
@@ -10,7 +10,9 @@ import { ItemCard } from '../components/ItemCard';
 import { CatalogActionsSheet } from '../components/CatalogActionsSheet';
 import { FilterSortSheet } from '../components/FilterSortSheet';
 import { CatalogStats } from '../components/CatalogStats';
+import { TransferProgressModal } from '../components/TransferProgressModal';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { useCatalogExport } from '../hooks/useCatalogTransfer';
 import { useItems, useLists, useInvalidateCatalog } from '../hooks/useCatalogQueries';
 import { applyQuery, computeStats, Filters, SortSpec } from '../domain/itemQuery';
 import { theme } from '../theme/theme';
@@ -40,6 +42,15 @@ export function ListDetailScreen({ route, navigation }: Props) {
   const [filters, setFilters] = useState<Filters>({});
   const [sheetVisible, setSheetVisible] = useState(false);
   const [actionsVisible, setActionsVisible] = useState(false);
+  const exporter = useCatalogExport(list);
+
+  useEffect(() => {
+    if (exporter.error) {
+      Alert.alert(t('transfer.exportTitle'), exporter.error);
+      exporter.reset();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [exporter.error]);
 
   const visible = useMemo(
     () => applyQuery(items, { searchText: debouncedSearch, filters, sort }),
@@ -194,11 +205,17 @@ export function ListDetailScreen({ route, navigation }: Props) {
           setActionsVisible(false);
           navigation.navigate('EditListFields', { list });
         }}
+        onExport={() => {
+          setActionsVisible(false);
+          void exporter.run();
+        }}
         onDelete={() => {
           setActionsVisible(false);
           confirmDeleteList();
         }}
       />
+
+      <TransferProgressModal visible={exporter.running} progress={exporter.progress} />
     </View>
   );
 }
