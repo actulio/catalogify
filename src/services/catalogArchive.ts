@@ -1,4 +1,4 @@
-import { zipSync, strToU8 } from 'fflate';
+import { zipSync, strToU8, unzipSync, strFromU8 } from 'fflate';
 import { CatalogItem, CatalogList, FieldDef, FieldValue } from '../domain/types';
 
 export const ARCHIVE_FORMAT_VERSION = 1;
@@ -64,4 +64,72 @@ export function buildArchive(
   for (const [path, bytes] of photos) files[path] = bytes;
 
   return zipSync(files, { level: 6 });
+}
+
+export enum ArchiveErrorCode {
+  Invalid = 'invalid',
+  UnsupportedVersion = 'unsupportedVersion',
+}
+export type ParseResult =
+  | { ok: true; data: ArchiveData; photos: Map<string, Uint8Array> }
+  | { ok: false; code: ArchiveErrorCode };
+
+function isFieldValue(v: unknown): v is FieldValue {
+  return v === null || ['string', 'number', 'boolean'].includes(typeof v);
+}
+function isArchiveItem(v: unknown): v is ArchiveItem {
+  if (typeof v !== 'object' || v === null) return false;
+  const o = v as Record<string, unknown>;
+  return (
+    typeof o.title === 'string' &&
+    typeof o.values === 'object' &&
+    o.values !== null &&
+    Object.values(o.values as Record<string, unknown>).every(isFieldValue) &&
+    (o.image === null || typeof o.image === 'string') &&
+    typeof o.createdAt === 'number' &&
+    typeof o.updatedAt === 'number'
+  );
+}
+function isArchiveData(v: unknown): v is ArchiveData {
+  if (typeof v !== 'object' || v === null) return false;
+  const o = v as Record<string, unknown>;
+  const c = o.catalog as Record<string, unknown> | undefined;
+  return (
+    typeof o.formatVersion === 'number' &&
+    !!c &&
+    typeof c.name === 'string' &&
+    Array.isArray(c.fields) &&
+    (c.coverImage === null || typeof c.coverImage === 'string') &&
+    Array.isArray(o.items) &&
+    o.items.every(isArchiveItem)
+  );
+}
+
+/** Parse and validate an export zip. Never throws — returns a tagged result. */
+export function parseArchive(zipBytes: Uint8Array): ParseResult {
+  let files: Record<string, Uint8Array>;
+  try {
+    files = unzipSync(zipBytes);
+  } catch {
+    return { ok: false, code: ArchiveErrorCode.Invalid };
+  }
+  const dataBytes = files[DATA_ENTRY];
+  if (!dataBytes) return { ok: false, code: ArchiveErrorCode.Invalid };
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(strFromU8(dataBytes));
+  } catch {
+    return { ok: false, code: ArchiveErrorCode.Invalid };
+  }
+  if (!isArchiveData(parsed)) return { ok: false, code: ArchiveErrorCode.Invalid };
+  if (parsed.formatVersion > ARCHIVE_FORMAT_VERSION) {
+    return { ok: false, code: ArchiveErrorCode.UnsupportedVersion };
+  }
+
+  const photos = new Map<string, Uint8Array>();
+  for (const [path, bytes] of Object.entries(files)) {
+    if (path !== DATA_ENTRY) photos.set(path, bytes);
+  }
+  return { ok: true, data: parsed, photos };
 }

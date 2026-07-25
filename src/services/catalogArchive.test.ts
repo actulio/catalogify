@@ -1,5 +1,5 @@
-import { unzipSync, strFromU8 } from 'fflate';
-import { buildArchive, ARCHIVE_FORMAT_VERSION } from './catalogArchive';
+import { unzipSync, strFromU8, zipSync, strToU8 } from 'fflate';
+import { buildArchive, ARCHIVE_FORMAT_VERSION, parseArchive, ArchiveErrorCode } from './catalogArchive';
 import { CatalogList, CatalogItem } from '../domain/types';
 
 const list: CatalogList = {
@@ -40,5 +40,60 @@ describe('buildArchive', () => {
     const zip = buildArchive({ ...list, coverUrl: undefined }, [], new Map());
     const data = JSON.parse(strFromU8(unzipSync(zip)['data.json']));
     expect(data.catalog.coverImage).toBeNull();
+  });
+});
+
+function makeZip(data: unknown, extra: Record<string, Uint8Array> = {}): Uint8Array {
+  return zipSync({ 'data.json': strToU8(JSON.stringify(data)), ...extra });
+}
+
+describe('parseArchive', () => {
+  const valid = {
+    formatVersion: 1,
+    app: 'catalogify',
+    exportedAt: 5,
+    catalog: { name: 'Wines', fields: [], coverImage: 'images/cover.jpg' },
+    items: [{ title: 'Barolo', values: { rating: 4 }, image: 'images/0.jpg', createdAt: 1, updatedAt: 2 }],
+  };
+
+  it('parses a valid archive and returns catalog, items and photo bytes', () => {
+    const zip = makeZip(valid, {
+      'images/cover.jpg': new Uint8Array([9]),
+      'images/0.jpg': new Uint8Array([8]),
+    });
+    const res = parseArchive(zip);
+    if (!res.ok) throw new Error('expected ok');
+    expect(res.data.catalog.name).toBe('Wines');
+    expect(res.data.items[0].title).toBe('Barolo');
+    expect(Array.from(res.photos.get('images/cover.jpg')!)).toEqual([9]);
+    expect(Array.from(res.photos.get('images/0.jpg')!)).toEqual([8]);
+  });
+
+  it('rejects a zip with no data.json', () => {
+    const zip = zipSync({ 'other.txt': strToU8('hi') });
+    const res = parseArchive(zip);
+    expect(res).toMatchObject({ ok: false, code: ArchiveErrorCode.Invalid });
+  });
+
+  it('rejects malformed json', () => {
+    const zip = zipSync({ 'data.json': strToU8('{ not json') });
+    expect(parseArchive(zip)).toMatchObject({ ok: false, code: ArchiveErrorCode.Invalid });
+  });
+
+  it('rejects a newer formatVersion', () => {
+    const res = parseArchive(makeZip({ ...valid, formatVersion: 2 }));
+    expect(res).toMatchObject({ ok: false, code: ArchiveErrorCode.UnsupportedVersion });
+  });
+
+  it('rejects when required shape is missing (no catalog.name)', () => {
+    const res = parseArchive(makeZip({ ...valid, catalog: { fields: [], coverImage: null } }));
+    expect(res).toMatchObject({ ok: false, code: ArchiveErrorCode.Invalid });
+  });
+
+  it('rejects bytes that are not a valid zip', () => {
+    expect(parseArchive(new Uint8Array([1, 2, 3, 4]))).toMatchObject({
+      ok: false,
+      code: ArchiveErrorCode.Invalid,
+    });
   });
 });
