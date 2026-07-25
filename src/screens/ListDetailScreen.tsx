@@ -121,7 +121,9 @@ export function ListDetailScreen({ route, navigation }: Props) {
         </Pressable>
       </View>
 
-      <CatalogStats stats={stats} />
+      {/* Hide the stats strip during the first uncached load so it doesn't
+          flash 0s before items arrive (the list shows a spinner meanwhile). */}
+      {!isLoading && <CatalogStats stats={stats} />}
 
       <FlatList
         data={visible}
