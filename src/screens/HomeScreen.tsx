@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useLayoutEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, FlatList, Pressable, Text, TextInput, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { CatalogList } from '../domain/types';
 import { useLists, useItemCounts } from '../hooks/useCatalogQueries';
@@ -18,6 +19,21 @@ export function HomeScreen({ navigation }: Props) {
   const { data: lists = [], isLoading } = useLists();
   const { data: counts = {} } = useItemCounts(lists.map((l) => l.id));
   const [search, setSearch] = useState('');
+  const { t } = useTranslation();
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Pressable
+          onPress={() => navigation.navigate('Settings')}
+          accessibilityLabel={t('home.openSettings')}
+          accessibilityRole="button"
+        >
+          <MaterialIcons name="settings" size={22} color={theme.colors.primary} />
+        </Pressable>
+      ),
+    });
+  }, [navigation, t]);
 
   const filteredLists = useMemo(() => {
     const needle = search.trim().toLowerCase();
@@ -45,7 +61,7 @@ export function HomeScreen({ navigation }: Props) {
       <View className="px-5 pt-4 pb-1">
         <TextInput
           className="bg-surface-container-low rounded-lg p-4 font-body-md text-body-md text-on-surface"
-          placeholder="Search catalogs"
+          placeholder={t('home.searchPlaceholder')}
           placeholderClassName="text-surface-dim"
           value={search}
           onChangeText={setSearch}
@@ -76,7 +92,7 @@ export function HomeScreen({ navigation }: Props) {
                 <MaterialIcons name="add" size={26} color={theme.colors.outline} />
               </View>
               <Text className="font-label-md text-label-md text-secondary uppercase tracking-widest">
-                New Catalog
+                {t('home.newCatalog')}
               </Text>
             </Pressable>
           );

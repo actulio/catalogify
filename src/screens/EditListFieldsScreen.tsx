@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { View, Text, TextInput, Pressable, Image, Alert, Switch } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { KeyboardAwareScrollViewRef } from 'react-native-keyboard-controller';
 import Animated, {
   FadeInDown,
@@ -58,6 +59,7 @@ function FieldTypeIcon({ type, active }: { type: FieldType; active: boolean }) {
 }
 
 export function EditListFieldsScreen({ route, navigation }: Props) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const existing = route.params?.list;
   const [name, setName] = useState(existing?.name ?? '');
@@ -115,7 +117,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
       navigation.goBack();
     } catch (error) {
       console.error('Failed to save list', error);
-      Alert.alert('Could not save', 'Please try again.');
+      Alert.alert(t('common.couldNotSave'), t('common.couldNotSaveBody'));
     } finally {
       setSaving(false);
     }
@@ -132,23 +134,23 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
         <View className="gap-6">
           <View className="gap-2">
             <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
-              Catalog Identity
+              {t('editFields.catalogIdentityLabel')}
             </Text>
             <TextInput
               className="font-headline-md text-headline-md text-on-surface border-b border-outline-variant/40 pb-2"
-              placeholder="Catalog Name"
+              placeholder={t('editFields.namePlaceholder')}
               placeholderClassName="text-surface-dim"
               value={name}
               onChangeText={setName}
               editable={!existing}
             />
             <Text className="font-body-md text-body-md text-on-surface-variant">
-              Give your catalog a name. This is what you'll see on the home screen.
+              {t('editFields.nameHelp')}
             </Text>
           </View>
           <View className="gap-2">
             <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
-              Cover Image
+              {t('editFields.coverImageLabel')}
             </Text>
             <Pressable onPress={pickCover}>
               {coverUri ? (
@@ -160,21 +162,21 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
               ) : (
                 <View className="w-32 aspect-[4/5] rounded-lg border-2 border-dashed border-surface-dim bg-surface-container-low items-center justify-center px-2">
                   <Text className="font-label-md text-label-md text-on-surface-variant text-center">
-                    Tap to add cover
+                    {t('editFields.tapToAddCover')}
                   </Text>
                 </View>
               )}
             </Pressable>
             <Text className="font-body-md text-body-md text-on-surface-variant">
-              Optional. Shown behind the catalog name on the home screen.
+              {t('editFields.coverHelp')}
             </Text>
           </View>
           <View className="gap-1">
             <Text className="font-headline-sm text-headline-sm text-on-surface">
-              Attributes & Schema
+              {t('editFields.attributesSchemaLabel')}
             </Text>
             <Text className="font-body-md text-body-md text-on-surface-variant">
-              Choose what details each item in this catalog will have.
+              {t('editFields.fieldsHelp')}
             </Text>
           </View>
         </View>
@@ -191,7 +193,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
               <View className="bg-surface-container-low rounded-lg p-4 gap-3">
                 <TextInput
                   className="font-label-md text-label-md text-on-surface border-b border-outline-variant/40 pb-1"
-                  placeholder="Field label"
+                  placeholder={t('editFields.fieldLabelPlaceholder')}
                   placeholderClassName="text-surface-dim"
                   value={item.label}
                   onChangeText={(label) => updateField(index, { label })}
@@ -200,10 +202,10 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
                   <View className="flex-row items-center gap-2">
                     <View className="flex-row items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary">
                       <FieldTypeIcon type="rating" active />
-                      <Text className="font-label-sm text-label-sm text-white">rating</Text>
+                      <Text className="font-label-sm text-label-sm text-white">{t('editFields.fieldType.rating')}</Text>
                     </View>
                     <Text className="font-label-sm text-label-sm text-on-surface-variant">
-                      Always included · required
+                      {t('editFields.alwaysIncludedRequired')}
                     </Text>
                   </View>
                 ) : (
@@ -224,7 +226,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
                               active ? 'text-white' : 'text-on-surface-variant'
                             }`}
                           >
-                            {type}
+                            {t(`editFields.fieldType.${type}`)}
                           </Text>
                         </Pressable>
                       );
@@ -234,7 +236,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
                 {(item.type === 'rating' || item.type === 'number') && (
                   <View className="flex-row items-center justify-between">
                     <Text className="font-label-md text-label-md text-on-surface-variant">
-                      Allow sorting by this field
+                      {t('editFields.allowSortingLabel')}
                     </Text>
                     <Switch
                       value={item.sortable !== false}
@@ -245,7 +247,7 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
                 )}
                 {!locked && (
                   <PressableScale onPress={() => removeField(index)}>
-                    <Text className="font-label-sm text-label-sm text-error">Remove field</Text>
+                    <Text className="font-label-sm text-label-sm text-error">{t('editFields.removeField')}</Text>
                   </PressableScale>
                 )}
               </View>
@@ -256,14 +258,14 @@ export function EditListFieldsScreen({ route, navigation }: Props) {
 
       <View className="px-5 pb-5 pt-2 gap-2 bg-background">
         <PressableScale className="py-4 items-center" onPress={addField}>
-          <Text className="font-label-md text-label-md text-primary">+ Add field</Text>
+          <Text className="font-label-md text-label-md text-primary">{t('editFields.addField')}</Text>
         </PressableScale>
         <PressableScale
           className={`bg-primary rounded-lg py-4 items-center ${saving ? 'opacity-60' : ''}`}
           onPress={save}
           disabled={saving}
         >
-          <Text className="text-white text-base">{saving ? 'Saving...' : 'Save'}</Text>
+          <Text className="text-white text-base">{saving ? t('common.saving') : t('common.save')}</Text>
         </PressableScale>
       </View>
     </View>

@@ -1,0 +1,111 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "couldNotSave": "Could not save",
+    "couldNotSaveBody": "Please try again.",
+    "couldNotDelete": "Could not delete",
+    "couldNotDeleteBody": "Please try again.",
+    "saving": "Saving...",
+    "yes": "Yes",
+    "no": "No",
+    "item_one": "{{count}} item",
+    "item_other": "{{count}} items"
+  },
+  "signIn": {
+    "signInWithGoogle": "Sign in with Google",
+    "tagline": "Catalog the things you love.",
+    "footer": "Your personal catalogs"
+  },
+  "home": {
+    "searchPlaceholder": "Search catalogs",
+    "newCatalog": "New Catalog",
+    "openSettings": "Settings"
+  },
+  "settings": {
+    "title": "Settings",
+    "languageSection": "Language",
+    "languagePortuguese": "Português",
+    "languageEnglish": "English"
+  },
+  "listDetail": {
+    "searchPlaceholder": "Search",
+    "filterSort": "Filter and sort",
+    "catalogActions": "Catalog actions",
+    "addItem": "Add item",
+    "toggleStats": "Toggle catalog stats",
+    "deleteListTitle": "Delete list?",
+    "deleteListMessage": "This removes \"{{name}}\" and all its items permanently.",
+    "couldNotDeleteList": "Could not delete list",
+    "emptyTitle": "This catalog is empty",
+    "emptyBody": "Tap + to add your first item.",
+    "noMatchesTitle": "No matches",
+    "noMatchesBody": "Try adjusting your search or filters."
+  },
+  "itemForm": {
+    "namePlaceholder": "Enter name...",
+    "pickDate": "Tap to pick a date",
+    "deleteItem": "Delete item",
+    "itemTitleLabel": "Item Title",
+    "galleryImageLabel": "Gallery Image",
+    "tapToAddPhoto": "Tap to add photo"
+  },
+  "itemDetail": {
+    "fallbackTitle": "Item",
+    "editItem": "Edit item",
+    "deleteItem": "Delete item",
+    "deleteItemTitle": "Delete item?",
+    "deleteItemMessage": "This removes \"{{title}}\" permanently.",
+    "noPhoto": "No photo"
+  },
+  "editFields": {
+    "namePlaceholder": "Catalog Name",
+    "nameHelp": "Give your catalog a name. This is what you'll see on the home screen.",
+    "coverHelp": "Optional. Shown behind the catalog name on the home screen.",
+    "fieldsHelp": "Choose what details each item in this catalog will have.",
+    "fieldLabelPlaceholder": "Field label",
+    "catalogIdentityLabel": "Catalog Identity",
+    "coverImageLabel": "Cover Image",
+    "tapToAddCover": "Tap to add cover",
+    "attributesSchemaLabel": "Attributes & Schema",
+    "alwaysIncludedRequired": "Always included · required",
+    "allowSortingLabel": "Allow sorting by this field",
+    "removeField": "Remove field",
+    "addField": "+ Add field",
+    "fieldType": {
+      "shortText": "Short text",
+      "longText": "Long text",
+      "number": "Number",
+      "rating": "Rating",
+      "photo": "Photo",
+      "boolean": "Boolean",
+      "date": "Date"
+    }
+  },
+  "catalogActions": {
+    "title": "Catalog Actions",
+    "close": "Close catalog actions",
+    "edit": "Edit Catalog",
+    "delete": "Delete Catalog"
+  },
+  "filterSort": {
+    "sortBy": "Sort by",
+    "filters": "Filters",
+    "sortDateAdded": "Date added",
+    "sortTitle": "Title",
+    "any": "Any",
+    "yes": "Yes",
+    "no": "No",
+    "from": "From",
+    "to": "To",
+    "atLeast": "at least {{value}}",
+    "clear": "Clear",
+    "clearAll": "Clear all"
+  },
+  "stats": {
+    "average": "avg {{value}}",
+    "averageRange": "avg {{avg}} · {{min}}–{{max}}",
+    "yesNo": "{{yes}} yes · {{no}} no"
+  }
+}

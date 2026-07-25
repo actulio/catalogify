@@ -2,6 +2,7 @@ import { useLayoutEffect, useMemo, useState } from 'react';
 import { View, TextInput, FlatList, Pressable, Text, Alert } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { RootStackParamList } from '../navigation/RootNavigator';
 import { FirebaseCatalogRepository } from '../services/FirebaseCatalogRepository';
 import { useAuth } from '../services/auth';
@@ -19,6 +20,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ListDetail'>;
 const DEFAULT_SORT: SortSpec = { field: { kind: 'dateAdded' }, direction: 'desc' };
 
 export function ListDetailScreen({ route, navigation }: Props) {
+  const { t } = useTranslation();
   const { list } = route.params;
   const { user } = useAuth();
   const { data: items = [] } = useItems(list.id);
@@ -43,7 +45,7 @@ export function ListDetailScreen({ route, navigation }: Props) {
       headerRight: () => (
         <Pressable
           onPress={() => setActionsVisible(true)}
-          accessibilityLabel="Catalog actions"
+          accessibilityLabel={t('listDetail.catalogActions')}
           accessibilityRole="button"
         >
           <MaterialIcons name="more-vert" size={24} color={theme.colors.primary} />
@@ -54,22 +56,26 @@ export function ListDetailScreen({ route, navigation }: Props) {
 
   function confirmDeleteList() {
     if (!user) return;
-    Alert.alert('Delete list?', `This removes "${list.name}" and all its items permanently.`, [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Delete',
-        style: 'destructive',
-        onPress: async () => {
-          try {
-            await new FirebaseCatalogRepository(user.uid).deleteList(list.id);
-            invalidate();
-            navigation.navigate('Home');
-          } catch (error) {
-            Alert.alert('Could not delete list', 'Please try again.');
-          }
+    Alert.alert(
+      t('listDetail.deleteListTitle'),
+      t('listDetail.deleteListMessage', { name: list.name }),
+      [
+        { text: t('common.cancel'), style: 'cancel' },
+        {
+          text: t('common.delete'),
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await new FirebaseCatalogRepository(user.uid).deleteList(list.id);
+              invalidate();
+              navigation.navigate('Home');
+            } catch (error) {
+              Alert.alert(t('listDetail.couldNotDeleteList'), t('common.couldNotDeleteBody'));
+            }
+          },
         },
-      },
-    ]);
+      ]
+    );
   }
 
   return (
@@ -83,7 +89,7 @@ export function ListDetailScreen({ route, navigation }: Props) {
       <View className="px-5 pt-3 pb-4 flex-row items-stretch gap-3">
         <TextInput
           className="flex-1 bg-surface-container-low rounded-lg p-4 font-body-md text-body-md text-on-surface"
-          placeholder="Search"
+          placeholder={t('listDetail.searchPlaceholder')}
           placeholderClassName="text-surface-dim"
           value={search}
           onChangeText={setSearch}
@@ -93,7 +99,7 @@ export function ListDetailScreen({ route, navigation }: Props) {
           className={`flex-row items-center justify-center gap-1 px-4 rounded-lg border ${
             filterCount > 0 ? 'border-primary' : 'border-outline-variant/40'
           }`}
-          accessibilityLabel="Filter and sort"
+          accessibilityLabel={t('listDetail.filterSort')}
           accessibilityRole="button"
         >
           <MaterialIcons
@@ -130,12 +136,14 @@ export function ListDetailScreen({ route, navigation }: Props) {
               />
             </View>
             <Text className="font-headline-sm text-headline-sm text-on-surface text-center">
-              {debouncedSearch.trim() || filterCount > 0 ? 'No matches' : 'This catalog is empty'}
+              {debouncedSearch.trim() || filterCount > 0
+                ? t('listDetail.noMatchesTitle')
+                : t('listDetail.emptyTitle')}
             </Text>
             <Text className="font-body-md text-body-md text-on-surface-variant text-center">
               {debouncedSearch.trim() || filterCount > 0
-                ? 'Try adjusting your search or filters.'
-                : 'Tap + to add your first item.'}
+                ? t('listDetail.noMatchesBody')
+                : t('listDetail.emptyBody')}
             </Text>
           </View>
         }
@@ -144,7 +152,7 @@ export function ListDetailScreen({ route, navigation }: Props) {
       <Pressable
         onPress={() => navigation.navigate('ItemForm', { list })}
         className="absolute right-5 bottom-5 w-14 h-14 rounded-full bg-primary items-center justify-center"
-        accessibilityLabel="Add item"
+        accessibilityLabel={t('listDetail.addItem')}
         accessibilityRole="button"
       >
         <MaterialIcons name="add" size={28} color="#ffffff" />

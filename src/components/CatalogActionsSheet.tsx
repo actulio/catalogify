@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { MaterialIcons } from '@expo/vector-icons';
+import { useTranslation } from 'react-i18next';
 import { theme } from '../theme/theme';
 
 interface CatalogActionsSheetProps {
@@ -18,6 +19,7 @@ interface CatalogActionsSheetProps {
 }
 
 export function CatalogActionsSheet({ visible, onClose, onEdit, onDelete }: CatalogActionsSheetProps) {
+  const { t } = useTranslation();
   // Keep the Modal mounted through the close animation: `rendered` lags `visible`
   // so the sheet can finish sliding out before the native modal unmounts.
   const [rendered, setRendered] = useState(visible);
@@ -49,7 +51,7 @@ export function CatalogActionsSheet({ visible, onClose, onEdit, onDelete }: Cata
           <Pressable
             className="flex-1"
             onPress={onClose}
-            accessibilityLabel="Close catalog actions"
+            accessibilityLabel={t('catalogActions.close')}
             accessibilityRole="button"
           />
         </Animated.View>
@@ -64,34 +66,42 @@ export function CatalogActionsSheet({ visible, onClose, onEdit, onDelete }: Cata
               <View className="w-12 h-1 rounded-full bg-secondary/20" />
             </View>
             <View className="px-5 py-4 border-b border-outline-variant/40 items-center">
-              <Text className="font-headline-sm text-headline-sm text-on-background">Catalog Actions</Text>
+              <Text className="font-headline-sm text-headline-sm text-on-background">
+                {t('catalogActions.title')}
+              </Text>
             </View>
             <Pressable
               onPress={onEdit}
               className="flex-row items-center gap-4 px-5 py-5"
               accessibilityRole="button"
-              accessibilityLabel="Edit Catalog"
+              accessibilityLabel={t('catalogActions.edit')}
             >
               <MaterialIcons name="edit" size={22} color={theme.colors.onSurfaceVariant} />
-              <Text className="font-body-lg text-body-lg text-on-background">Edit Catalog</Text>
+              <Text className="font-body-lg text-body-lg text-on-background">
+                {t('catalogActions.edit')}
+              </Text>
             </Pressable>
             <Pressable
               onPress={onDelete}
               className="flex-row items-center gap-4 px-5 py-5"
               accessibilityRole="button"
-              accessibilityLabel="Delete Catalog"
+              accessibilityLabel={t('catalogActions.delete')}
             >
               <MaterialIcons name="delete" size={22} color={theme.colors.danger} />
-              <Text className="font-body-lg text-body-lg text-error">Delete Catalog</Text>
+              <Text className="font-body-lg text-body-lg text-error">
+                {t('catalogActions.delete')}
+              </Text>
             </Pressable>
             <View className="px-5 pt-2">
               <Pressable
                 onPress={onClose}
                 className="w-full py-4 rounded-lg bg-surface-container-highest items-center"
                 accessibilityRole="button"
-                accessibilityLabel="Cancel"
+                accessibilityLabel={t('common.cancel')}
               >
-                <Text className="font-label-md text-label-md text-on-surface-variant">CANCEL</Text>
+                <Text className="font-label-md text-label-md text-on-surface-variant">
+                  {t('common.cancel').toUpperCase()}
+                </Text>
               </Pressable>
             </View>
           </View>

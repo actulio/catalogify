@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { View, Text, TextInput, Pressable, Image, Switch, Alert } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import * as ImagePicker from 'expo-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
@@ -15,6 +16,7 @@ import { FormScreen } from '../components/FormScreen';
 type Props = NativeStackScreenProps<RootStackParamList, 'ItemForm'>;
 
 export function ItemFormScreen({ route, navigation }: Props) {
+  const { t } = useTranslation();
   const { list, item } = route.params;
   const { user } = useAuth();
   const invalidate = useInvalidateCatalog(list.id);
@@ -53,7 +55,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
       navigation.goBack();
     } catch (error) {
       console.error('Failed to save item', error);
-      Alert.alert('Could not save', 'Please try again.');
+      Alert.alert(t('common.couldNotSave'), t('common.couldNotSaveBody'));
     } finally {
       setSaving(false);
     }
@@ -61,10 +63,10 @@ export function ItemFormScreen({ route, navigation }: Props) {
 
   async function remove() {
     if (!item || !user) return;
-    Alert.alert('Delete item?', `This removes "${item.title}" permanently.`, [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('itemDetail.deleteItemTitle'), t('itemDetail.deleteItemMessage', { title: item.title }), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Delete',
+        text: t('common.delete'),
         style: 'destructive',
         onPress: async () => {
           try {
@@ -74,7 +76,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
             navigation.goBack();
           } catch (error) {
             console.error('Failed to delete item', error);
-            Alert.alert('Could not delete', 'Please try again.');
+            Alert.alert(t('common.couldNotDelete'), t('common.couldNotDeleteBody'));
           }
         },
       },
@@ -85,11 +87,11 @@ export function ItemFormScreen({ route, navigation }: Props) {
     <FormScreen className="flex-1 bg-background" contentContainerClassName="p-5 gap-8 pb-16">
       <View className="gap-2">
         <Text className="font-label-md text-label-sm uppercase tracking-widest text-on-surface-variant">
-          Item Title
+          {t('itemForm.itemTitleLabel')}
         </Text>
         <TextInput
           className="border-b-2 border-surface-dim font-headline-sm text-headline-sm text-on-surface py-3"
-          placeholder="Enter name..."
+          placeholder={t('itemForm.namePlaceholder')}
           placeholderClassName="text-surface-dim"
           value={title}
           onChangeText={setTitle}
@@ -100,14 +102,14 @@ export function ItemFormScreen({ route, navigation }: Props) {
       {list.fields.some((f) => f.type === 'photo') && (
         <View className="gap-2">
           <Text className="font-label-md text-label-sm uppercase tracking-widest text-on-surface-variant">
-            Gallery Image
+            {t('itemForm.galleryImageLabel')}
           </Text>
           <Pressable onPress={pickPhoto}>
             {photoUri ? (
               <Image source={{ uri: photoUri }} className="w-full aspect-square rounded-xl" resizeMode="cover" />
             ) : (
               <View className="w-full aspect-square rounded-xl border-2 border-dashed border-surface-dim bg-surface-container-low items-center justify-center">
-                <Text className="font-label-md text-label-md text-on-surface-variant">Tap to add photo</Text>
+                <Text className="font-label-md text-label-md text-on-surface-variant">{t('itemForm.tapToAddPhoto')}</Text>
               </View>
             )}
           </Pressable>
@@ -147,7 +149,7 @@ export function ItemFormScreen({ route, navigation }: Props) {
                           month: 'short',
                           year: 'numeric',
                         })
-                      : 'Tap to pick a date'}
+                      : t('itemForm.pickDate')}
                   </Text>
                 </Pressable>
                 {datePickerFor === field.key && (
@@ -202,12 +204,12 @@ export function ItemFormScreen({ route, navigation }: Props) {
         onPress={save}
         disabled={saving}
       >
-        <Text className="text-white text-base">{saving ? 'Saving...' : 'Save'}</Text>
+        <Text className="text-white text-base">{saving ? t('common.saving') : t('common.save')}</Text>
       </Pressable>
 
       {item && (
         <Pressable onPress={remove}>
-          <Text className="text-error text-center">Delete item</Text>
+          <Text className="text-error text-center">{t('itemForm.deleteItem')}</Text>
         </Pressable>
       )}
     </FormScreen>

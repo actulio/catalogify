@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react';
 import { Alert, Image, Pressable, ScrollView, Text, View } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { MaterialIcons } from '@expo/vector-icons';
 import { RootStackParamList } from '../navigation/RootNavigator';
@@ -22,31 +23,32 @@ function formatDate(ms: number): string {
 }
 
 export function ItemDetailScreen({ route, navigation }: Props) {
+  const { t } = useTranslation();
   const { list, item } = route.params;
   const { user } = useAuth();
   const invalidate = useInvalidateCatalog(list.id);
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: item.title || 'Item',
+      title: item.title || t('itemDetail.fallbackTitle'),
       headerRight: () => (
         <Pressable
           onPress={() => navigation.navigate('ItemForm', { list, item })}
-          accessibilityLabel="Edit item"
+          accessibilityLabel={t('itemDetail.editItem')}
           accessibilityRole="button"
         >
           <MaterialIcons name="edit" size={22} color={theme.colors.primary} />
         </Pressable>
       ),
     });
-  }, [navigation, list, item]);
+  }, [navigation, list, item, t]);
 
   function remove() {
     if (!user) return;
-    Alert.alert('Delete item?', `This removes "${item.title}" permanently.`, [
-      { text: 'Cancel', style: 'cancel' },
+    Alert.alert(t('itemDetail.deleteItemTitle'), t('itemDetail.deleteItemMessage', { title: item.title }), [
+      { text: t('common.cancel'), style: 'cancel' },
       {
-        text: 'Delete',
+        text: t('common.delete'),
         style: 'destructive',
         onPress: async () => {
           try {
@@ -55,7 +57,7 @@ export function ItemDetailScreen({ route, navigation }: Props) {
             navigation.goBack();
           } catch (error) {
             console.error('Failed to delete item', error);
-            Alert.alert('Could not delete', 'Please try again.');
+            Alert.alert(t('common.couldNotDelete'), t('common.couldNotDeleteBody'));
           }
         },
       },
@@ -74,7 +76,7 @@ export function ItemDetailScreen({ route, navigation }: Props) {
       ) : (
         <View className="w-full h-72 bg-surface-container items-center justify-center">
           <Text className="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest">
-            No photo
+            {t('itemDetail.noPhoto')}
           </Text>
         </View>
       )}
@@ -98,7 +100,7 @@ export function ItemDetailScreen({ route, navigation }: Props) {
                   }`}
                 >
                   <Text className="font-label-md text-label-md text-on-surface">
-                    {value ? 'Yes' : 'No'}
+                    {value ? t('common.yes') : t('common.no')}
                   </Text>
                 </View>
               ) : field.type === 'date' ? (
@@ -113,7 +115,7 @@ export function ItemDetailScreen({ route, navigation }: Props) {
         })}
 
         <Pressable onPress={remove} className="mt-4 py-3">
-          <Text className="font-label-md text-label-md text-error text-center">Delete item</Text>
+          <Text className="font-label-md text-label-md text-error text-center">{t('itemDetail.deleteItem')}</Text>
         </Pressable>
       </View>
     </ScrollView>
