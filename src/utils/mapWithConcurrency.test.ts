@@ -37,4 +37,24 @@ describe('mapWithConcurrency', () => {
       mapWithConcurrency([1, 2], 2, async (n) => n, ctrl.signal)
     ).rejects.toMatchObject({ name: 'AbortError' });
   });
+
+  it('stops picking up new work when aborted mid-run', async () => {
+    const ctrl = new AbortController();
+    const seen: number[] = [];
+    const run = mapWithConcurrency(
+      [1, 2, 3, 4, 5],
+      1, // one at a time so ordering is deterministic
+      async (n) => {
+        seen.push(n);
+        if (n === 2) ctrl.abort(); // abort after the 2nd item begins
+        return n;
+      },
+      ctrl.signal
+    );
+    await expect(run).rejects.toMatchObject({ name: 'AbortError' });
+    // With limit 1, after item 2 aborts, the worker's next loop iteration throws
+    // before item 3 is picked up — so items 4 and 5 are never processed.
+    expect(seen).not.toContain(4);
+    expect(seen).not.toContain(5);
+  });
 });
