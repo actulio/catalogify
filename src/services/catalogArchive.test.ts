@@ -96,4 +96,21 @@ describe('parseArchive', () => {
       code: ArchiveErrorCode.Invalid,
     });
   });
+
+  it('rejects an archive with malformed field defs', () => {
+    const res = parseArchive(makeZip({ ...valid, catalog: { name: 'W', fields: [123], coverImage: null } }));
+    expect(res).toMatchObject({ ok: false, code: ArchiveErrorCode.Invalid });
+  });
+
+  it('rejects an item whose values is an array', () => {
+    const res = parseArchive(
+      makeZip({ ...valid, items: [{ title: 'X', values: [1, 2], image: null, createdAt: 1, updatedAt: 2 }] })
+    );
+    expect(res).toMatchObject({ ok: false, code: ArchiveErrorCode.Invalid });
+  });
+
+  it('rejects an archive with the wrong app marker', () => {
+    const res = parseArchive(makeZip({ ...valid, app: 'other' }));
+    expect(res).toMatchObject({ ok: false, code: ArchiveErrorCode.Invalid });
+  });
 });

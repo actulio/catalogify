@@ -77,6 +77,18 @@ export type ParseResult =
 function isFieldValue(v: unknown): v is FieldValue {
   return v === null || ['string', 'number', 'boolean'].includes(typeof v);
 }
+const FIELD_TYPES = ['shortText', 'longText', 'number', 'rating', 'photo', 'boolean', 'date'];
+function isFieldDef(v: unknown): v is FieldDef {
+  if (typeof v !== 'object' || v === null) return false;
+  const o = v as Record<string, unknown>;
+  return (
+    typeof o.key === 'string' &&
+    typeof o.label === 'string' &&
+    typeof o.type === 'string' &&
+    FIELD_TYPES.includes(o.type) &&
+    typeof o.required === 'boolean'
+  );
+}
 function isArchiveItem(v: unknown): v is ArchiveItem {
   if (typeof v !== 'object' || v === null) return false;
   const o = v as Record<string, unknown>;
@@ -84,6 +96,7 @@ function isArchiveItem(v: unknown): v is ArchiveItem {
     typeof o.title === 'string' &&
     typeof o.values === 'object' &&
     o.values !== null &&
+    !Array.isArray(o.values) &&
     Object.values(o.values as Record<string, unknown>).every(isFieldValue) &&
     (o.image === null || typeof o.image === 'string') &&
     typeof o.createdAt === 'number' &&
@@ -96,9 +109,12 @@ function isArchiveData(v: unknown): v is ArchiveData {
   const c = o.catalog as Record<string, unknown> | undefined;
   return (
     typeof o.formatVersion === 'number' &&
+    o.app === 'catalogify' &&
+    typeof o.exportedAt === 'number' &&
     !!c &&
     typeof c.name === 'string' &&
     Array.isArray(c.fields) &&
+    c.fields.every(isFieldDef) &&
     (c.coverImage === null || typeof c.coverImage === 'string') &&
     Array.isArray(o.items) &&
     o.items.every(isArchiveItem)
