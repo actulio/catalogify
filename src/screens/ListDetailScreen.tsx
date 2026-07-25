@@ -11,7 +11,7 @@ import { CatalogActionsSheet } from '../components/CatalogActionsSheet';
 import { FilterSortSheet } from '../components/FilterSortSheet';
 import { CatalogStats } from '../components/CatalogStats';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
-import { useItems, useInvalidateCatalog } from '../hooks/useCatalogQueries';
+import { useItems, useLists, useInvalidateCatalog } from '../hooks/useCatalogQueries';
 import { applyQuery, computeStats, Filters, SortSpec } from '../domain/itemQuery';
 import { theme } from '../theme/theme';
 
@@ -21,8 +21,16 @@ const DEFAULT_SORT: SortSpec = { field: { kind: 'dateAdded' }, direction: 'desc'
 
 export function ListDetailScreen({ route, navigation }: Props) {
   const { t } = useTranslation();
-  const { list } = route.params;
+  const { list: routeList } = route.params;
   const { user } = useAuth();
+  // Source the live list (schema/name) from React Query so edits to the
+  // catalog's fields reflect immediately; fall back to the nav snapshot
+  // while lists are loading so there's no flash.
+  const { data: lists } = useLists();
+  const list = useMemo(
+    () => lists?.find((l) => l.id === routeList.id) ?? routeList,
+    [lists, routeList]
+  );
   const { data: items = [], isLoading } = useItems(list.id);
   const invalidate = useInvalidateCatalog(list.id);
 
