@@ -1,7 +1,7 @@
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
-import { CatalogItem, CatalogList } from '../domain/types';
-import { buildArchive, COVER_ENTRY, itemImageEntry } from './catalogArchive';
+import { CatalogItem, CatalogList, FieldDef, FieldValue } from '../domain/types';
+import { buildArchive, COVER_ENTRY, itemImageEntry, parseArchive, ArchiveErrorCode } from './catalogArchive';
 import { mapWithConcurrency } from '../utils/mapWithConcurrency';
 
 /** Injectable I/O boundary so orchestration is testable without native modules. */
@@ -115,4 +115,69 @@ export async function exportCatalog(
   onProgress?.({ phase: 'share' });
   await io.share(uri, 'application/zip', list.name);
   return uri;
+}
+
+export class ImportError extends Error {
+  name = 'ImportError';
+  constructor(public code: ArchiveErrorCode) {
+    super(`import failed: ${code}`);
+  }
+}
+
+interface ImportRepoLike {
+  createList(name: string, fields: FieldDef[], coverUri?: string): Promise<CatalogList>;
+  addItem(
+    listId: string,
+    title: string,
+    values: Record<string, FieldValue>,
+    photoUri?: string
+  ): Promise<CatalogItem>;
+}
+
+/**
+ * Import a catalog zip, always creating a NEW catalog. Cancellable during the
+ * parse/write prep phase; once the commit (createList/addItem) begins it runs to
+ * completion. Photos are written to temp files and replayed through the repo,
+ * which re-uploads them to the importer's own storage. Returns the new catalog.
+ */
+export async function importCatalog(
+  repo: ImportRepoLike,
+  zipBytes: Uint8Array,
+  io: TransferIo,
+  { onProgress, signal }: TransferOptions
+): Promise<CatalogList> {
+  onProgress?.({ phase: 'read' });
+  const parsed = parseArchive(zipBytes);
+  if (!parsed.ok) throw new ImportError(parsed.code);
+  if (signal?.aborted) throw new ImportError(ArchiveErrorCode.Invalid);
+
+  const { data, photos } = parsed;
+  const tempUris: string[] = [];
+
+  // Write every referenced photo to a temp file (prep phase, cancellable).
+  async function tempUriFor(entry: string | null): Promise<string | undefined> {
+    if (!entry) return undefined;
+    const bytes = photos.get(entry);
+    if (!bytes) return undefined; // referenced but missing → skip photo
+    const uri = await io.writeTempFile(`import-${tempUris.length}.jpg`, bytes);
+    tempUris.push(uri);
+    return uri;
+  }
+
+  try {
+    const coverUri = await tempUriFor(data.catalog.coverImage);
+    const itemUris = await Promise.all(data.items.map((it) => tempUriFor(it.image)));
+    if (signal?.aborted) throw new ImportError(ArchiveErrorCode.Invalid);
+
+    // Commit phase (no longer cancellable).
+    onProgress?.({ phase: 'finishing' });
+    const list = await repo.createList(data.catalog.name, data.catalog.fields, coverUri);
+    for (let i = 0; i < data.items.length; i++) {
+      const it = data.items[i];
+      await repo.addItem(list.id, it.title, it.values, itemUris[i]);
+    }
+    return list;
+  } finally {
+    io.cleanup(tempUris);
+  }
 }

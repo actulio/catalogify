@@ -1,6 +1,9 @@
 import { unzipSync, strFromU8 } from 'fflate';
 import { exportCatalog, importCatalog, TransferIo } from './catalogTransfer';
 import { CatalogList, CatalogItem } from '../domain/types';
+import { buildArchive } from './catalogArchive';
+import { ArchiveErrorCode } from './catalogArchive';
+import { ImportError } from './catalogTransfer';
 
 const list: CatalogList = { id: 'L1', name: 'Wines', fields: [], coverUrl: 'https://x/cover.jpg', createdAt: 1 };
 const items: CatalogItem[] = [
@@ -58,5 +61,61 @@ describe('exportCatalog', () => {
     const files = unzipSync([...io.written.values()][0]);
     expect(files['images/0.jpg']).toBeUndefined(); // failed item photo omitted
     expect(files['images/cover.jpg']).toBeDefined(); // cover succeeded
+  });
+});
+
+describe('importCatalog', () => {
+  function makeRepo() {
+    const created: any[] = [];
+    const added: any[] = [];
+    return {
+      created,
+      added,
+      createList: jest.fn(async (name: string, fields: any[], coverUri?: string) => {
+        const l = { id: 'NEW', name, fields, coverUrl: coverUri, createdAt: 9 };
+        created.push({ name, fields, coverUri });
+        return l;
+      }),
+      addItem: jest.fn(async (listId: string, title: string, values: any, photoUri?: string) => {
+        added.push({ listId, title, values, photoUri });
+        return { id: 'x', listId, title, values, createdAt: 1, updatedAt: 1 };
+      }),
+    };
+  }
+
+  it('recreates the catalog then adds each item, passing temp photo uris', async () => {
+    const list = { id: 'L1', name: 'Wines', fields: [], coverUrl: 'https://x/cover.jpg', createdAt: 1 } as any;
+    const items = [
+      { id: 'I1', listId: 'L1', title: 'Barolo', values: { rating: 4 }, photoUrl: 'https://x/1.jpg', createdAt: 1, updatedAt: 2 },
+      { id: 'I2', listId: 'L1', title: 'Chianti', values: {}, createdAt: 3, updatedAt: 4 },
+    ] as any;
+    const zip = buildArchive(list, items, new Map([
+      ['images/cover.jpg', new Uint8Array([1])],
+      ['images/0.jpg', new Uint8Array([2])],
+    ]));
+
+    const io = fakeIo();
+    const repo = makeRepo();
+    const created = await importCatalog(repo as any, zip, io, {});
+
+    expect(created.id).toBe('NEW');
+    expect(repo.createList).toHaveBeenCalledTimes(1);
+    expect(repo.created[0].name).toBe('Wines');
+    expect(repo.created[0].coverUri).toMatch(/^file:/); // cover written to temp then passed
+    expect(repo.addItem).toHaveBeenCalledTimes(2);
+    expect(repo.added[0].title).toBe('Barolo');
+    expect(repo.added[0].photoUri).toMatch(/^file:/);
+    expect(repo.added[1].title).toBe('Chianti');
+    expect(repo.added[1].photoUri).toBeUndefined(); // no photo
+  });
+
+  it('throws ImportError(invalidFile) for a non-archive', async () => {
+    const io = fakeIo();
+    const repo = makeRepo();
+    await expect(importCatalog(repo as any, new Uint8Array([1, 2, 3]), io, {})).rejects.toMatchObject({
+      name: 'ImportError',
+      code: ArchiveErrorCode.Invalid,
+    });
+    expect(repo.createList).not.toHaveBeenCalled();
   });
 });
