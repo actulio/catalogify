@@ -18,12 +18,12 @@ _Last updated: 2026-07-24. Current state: all work on **`main`**, no open branch
 - Cache-refresh-after-edit: add/edit/delete updates list + counts + stats in place.
 - Loading-spinner fix (`169598a`): first open shows spinner, no empty-state flash.
 - Stale-schema fix (`ce2569c`): field edits reflect on back-nav without re-opening.
+- Stats-bar loading flash (`1f78cf6`): `CatalogStats` hidden during first uncached load (was flashing 0s). Green (tsc 0, 60 tests); eyeball on next build.
 
 ## Backlog (each is its own session; brainstorm before building)
 - [ ] **▶ START HERE — Export / import catalogs (e.g. JSON/CSV).** The next feature. Not yet brainstormed — **run the `brainstorming` skill first** (unresolved design questions: which formats? whole-catalog vs. per-list? do item **photos** travel — they live in Supabase Storage, so export is either data-only or needs to bundle/relink image URLs? how does import handle schema/field mismatches and id collisions? share-sheet/file-picker vs. clipboard?). Reuse the domain layer: catalog/item shapes are in `src/domain/types.ts`; querying/deriving in `src/domain/itemQuery.ts`; data access in `src/services/FirebaseCatalogRepository.ts`. **i18n is live** — author all new UI strings via `t('area.key')` with keys in BOTH `pt.json`/`en.json` (parity test enforces). File I/O will likely need a new Expo native module (e.g. `expo-file-system`/`expo-sharing`/`expo-document-picker`) → **dev-client rebuild**.
 - [ ] **Catalog sharing.** Share a catalog with other users. Non-trivial: rewrites Firestore security rules + Supabase Storage RLS to a membership/ACL model. Treat as its own project.
 - [ ] **Barcode scanning** to prefill item data.
-- [ ] _(optional polish)_ **Stats-bar loading flash** — `CatalogStats` briefly shows `0`s during a catalog's first uncached load (same class as the fixed list flash). Gate on `isLoading` from `useItems` in `ListDetailScreen` if it bothers you. Small inline fix.
 - ✅ **Localization (PT/EN)** — DONE + verified, merged `f765f0b`.
 
 ## How to work here
