@@ -29,7 +29,12 @@
       "@react-native-google-signin/google-signin",
       "expo-font",
       "@react-native-community/datetimepicker",
-      "expo-localization"
+      "expo-localization",
+      "expo-sharing",
+      [
+        "expo-file-system",
+        { "supportsOpeningDocumentsInPlace": true, "enableFileSharing": true }
+      ]
     ]
   }
 }
