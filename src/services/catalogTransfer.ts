@@ -155,18 +155,18 @@ export async function importCatalog(
   const tempUris: string[] = [];
 
   // Write every referenced photo to a temp file (prep phase, cancellable).
-  async function tempUriFor(entry: string | null): Promise<string | undefined> {
+  async function tempUriFor(entry: string | null, slot: string): Promise<string | undefined> {
     if (!entry) return undefined;
     const bytes = photos.get(entry);
     if (!bytes) return undefined; // referenced but missing → skip photo
-    const uri = await io.writeTempFile(`import-${tempUris.length}.jpg`, bytes);
+    const uri = await io.writeTempFile(`import-${slot}.jpg`, bytes);
     tempUris.push(uri);
     return uri;
   }
 
   try {
-    const coverUri = await tempUriFor(data.catalog.coverImage);
-    const itemUris = await Promise.all(data.items.map((it) => tempUriFor(it.image)));
+    const coverUri = await tempUriFor(data.catalog.coverImage, 'cover');
+    const itemUris = await Promise.all(data.items.map((it, i) => tempUriFor(it.image, String(i))));
     if (signal?.aborted) throw new ImportError(ArchiveErrorCode.Invalid);
 
     // Commit phase (no longer cancellable).

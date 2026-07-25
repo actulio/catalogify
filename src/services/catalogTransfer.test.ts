@@ -118,4 +118,23 @@ describe('importCatalog', () => {
     });
     expect(repo.createList).not.toHaveBeenCalled();
   });
+
+  it('writes a distinct temp file per photo when multiple items have images', async () => {
+    const list = { id: 'L1', name: 'Wines', fields: [], createdAt: 1 } as any;
+    const items = [
+      { id: 'I1', listId: 'L1', title: 'A', values: {}, photoUrl: 'https://x/1.jpg', createdAt: 1, updatedAt: 2 },
+      { id: 'I2', listId: 'L1', title: 'B', values: {}, photoUrl: 'https://x/2.jpg', createdAt: 3, updatedAt: 4 },
+    ] as any;
+    const zip = buildArchive(list, items, new Map([
+      ['images/0.jpg', new Uint8Array([1])],
+      ['images/1.jpg', new Uint8Array([2])],
+    ]));
+    const io = fakeIo();
+    const repo = makeRepo();
+    await importCatalog(repo as any, zip, io, {});
+    const uris = repo.added.map((a: any) => a.photoUri);
+    expect(uris[0]).toBeDefined();
+    expect(uris[1]).toBeDefined();
+    expect(uris[0]).not.toBe(uris[1]); // distinct temp files — no collision
+  });
 });
